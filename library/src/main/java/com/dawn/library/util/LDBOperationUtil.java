@@ -10,7 +10,7 @@ import com.litesuits.orm.db.model.ConflictAlgorithm;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class LDBOperation {
+public class LDBOperationUtil {
     public static final String DB_NAME = "lite_orm";
     private static LiteOrm liteOrm;
 

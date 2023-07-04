@@ -42,20 +42,20 @@ public class LDateUtil {
 
     /**
      * 自定义格式的格式化日期时间
-     * @param beginDate 时间long
+     * @param time 时间long
      * @param format 格式化的类型字符串
      */
-    public static String formatDateCustom(long beginDate, String format) {
-        return new SimpleDateFormat(format, Locale.US).format(new Date(beginDate));
+    public static String formatDateCustom(long time, String format) {
+        return new SimpleDateFormat(format, Locale.US).format(new Date(time));
     }
 
     /**
      * 自定义格式的格式化日期时间
-     * @param beginDate 时间date类型
+     * @param date 时间date类型
      * @param format 格式字符串
      */
-    public static String formatDateCustom(Date beginDate, String format) {
-        return new SimpleDateFormat(format, Locale.US).format(beginDate);
+    public static String formatDateCustom(Date date, String format) {
+        return new SimpleDateFormat(format, Locale.US).format(date);
     }
 
     /**
