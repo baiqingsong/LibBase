@@ -94,6 +94,18 @@ Application的基类
 * deleteFiles 删除文件夹下的所有文件
 * fileToByteAry 文件转换成byte数组
 
+#### LImageUtil
+图片展示工具类
+* displayImage 显示本地图片
+* displayImage 显示网络图片，assets下图片，SD卡下图片
+* displayImage 显示Uri图片
+* saveBitmapToFile 保存图片到本地
+* bitmapToBase64 bitmap转换成base64
+* base64ToBitmap base64转换成bitmap
+* readBitmapFromAssets 读取assets下的图片
+* readBitmapFromFile 读取SD卡下的图片
+* adjustPhotoRotation 图片旋转
+
 #### LJsonUtil
 json工具类
 * toJson 将对象转换成json字符串
