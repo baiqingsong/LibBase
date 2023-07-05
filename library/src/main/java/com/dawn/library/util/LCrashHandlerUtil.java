@@ -61,7 +61,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
     /**
      * 初始化
      */
-    public void init(Context context) {
+    public LCrashHandlerUtil init(Context context) {
         //得到系统的应用异常处理器
         mDefaultCrashHandler = Thread.getDefaultUncaughtExceptionHandler();
         //将当前应用异常处理器改为默认的
@@ -70,6 +70,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
 
         PATH = getFilePath(context);
         checkFilePath(PATH);
+        return sInstance;
     }
 
 
@@ -170,7 +171,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * 获得文件存储路径
      */
     @SuppressWarnings("WeakerAccess")
-    public static String getFilePath(Context context) {
+    public String getFilePath(Context context) {
         if(context == null)
             return null;
         if (!Environment.isExternalStorageRemovable()) {//如果外部储存可用
@@ -189,7 +190,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * @param date 日期
      */
     @SuppressWarnings("WeakerAccess")
-    public static String getFileName(Date date){
+    public String getFileName(Date date){
         return PATH + "crash_" + dateFormat.format(date) + ".trace";
     }
 
@@ -197,7 +198,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * 检查文件目录，主要是查看是否存在，是否暂用内存过多
      * @param pathName 路径
      */
-    private static void checkFilePath(String pathName){
+    private void checkFilePath(String pathName){
         File file = new File(pathName);
         if (file.exists()) {
             if (getFolderSize(file) > 100 * 1024 * 1024) {
@@ -212,7 +213,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * 查看文件大小，限制文件小于20M
      * @param fileName 文件地址
      */
-    private static void checkFileSize(String fileName){
+    private void checkFileSize(String fileName){
         try{
             File file = new File(fileName);
             if(file.exists() && file.length() > 10 * 1024  * 1024){
@@ -229,7 +230,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * @param file 文件
      */
     @SuppressWarnings("WeakerAccess")
-    public static long getFolderSize(File file) {
+    public long getFolderSize(File file) {
         long size = 0;
         try {
             File[] fileList = file.listFiles();
@@ -251,7 +252,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * @param file 需要删除的文件
      */
     @SuppressWarnings("WeakerAccess")
-    public static boolean deleteFolder(File file) {
+    public boolean deleteFolder(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             boolean deleteAll = true;
