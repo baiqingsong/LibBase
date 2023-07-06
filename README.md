@@ -20,6 +20,7 @@ Application的基类
 #### LAppUtil
 应用相关工具类
 * getVersionName 获取版本名称
+* getVersionCode 获取版本号
 
 #### LCipherUtil
 密码工具类
