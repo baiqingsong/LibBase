@@ -1,4 +1,4 @@
-package com.dawn.library.util;
+package com.dawn.library.util.wifi;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class LWifiMgr {
+class LWifiMgr {
     //过滤免密码连接的WiFi
     public static final String NO_PASSWORD = "[ESS]";
     public static final String NO_PASSWORD_WPS = "[WPS][ESS]";

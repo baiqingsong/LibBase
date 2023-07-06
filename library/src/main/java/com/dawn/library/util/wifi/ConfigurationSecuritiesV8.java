@@ -5,7 +5,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiConfiguration.AuthAlgorithm;
 import android.net.wifi.WifiConfiguration.KeyMgmt;
 
-public class ConfigurationSecuritiesV8 extends ConfigurationSecurities {
+class ConfigurationSecuritiesV8 extends ConfigurationSecurities {
 	
 	private static final int SECURITY_NONE = 0;
     private static final int SECURITY_WEP = 1;

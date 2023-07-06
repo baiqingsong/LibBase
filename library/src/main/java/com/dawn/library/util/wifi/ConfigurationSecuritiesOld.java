@@ -10,7 +10,7 @@ import android.net.wifi.WifiConfiguration.Protocol;
 import android.text.TextUtils;
 
 @SuppressWarnings("unused")
-public class ConfigurationSecuritiesOld extends ConfigurationSecurities {
+class ConfigurationSecuritiesOld extends ConfigurationSecurities {
 	
 	// Constants used for different security types
 	private static final String WPA2 = "WPA2";

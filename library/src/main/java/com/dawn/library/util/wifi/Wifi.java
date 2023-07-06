@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class Wifi {
+class Wifi {
 	
 	public static final ConfigurationSecurities ConfigSec = ConfigurationSecurities.newInstance();
 

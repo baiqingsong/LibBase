@@ -12,7 +12,7 @@ import android.os.IBinder;
 
 import java.util.List;
 
-public class ReenableAllApsWhenNetworkStateChanged {
+class ReenableAllApsWhenNetworkStateChanged {
 	static void schedule(final Context ctx) {
 		ctx.startService(new Intent(ctx, BackgroundService.class));
 	}

@@ -4,7 +4,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 
 @SuppressWarnings("unused")
-public abstract class ConfigurationSecurities {
+abstract class ConfigurationSecurities {
 	/**
      * @return The security of a given {@link WifiConfiguration}.
      */

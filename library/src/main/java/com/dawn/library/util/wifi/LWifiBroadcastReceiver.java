@@ -1,4 +1,4 @@
-package com.dawn.library.receiver;
+package com.dawn.library.util.wifi;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,14 +7,14 @@ import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
-import com.dawn.library.util.LWifiMgr;
+import com.dawn.library.util.wifi.LWifiMgr;
 
 import java.util.List;
 
 /**
  * Created by AA on 2017/3/24.
  */
-public abstract class LWifiBroadcastReceiver extends BroadcastReceiver {
+abstract class LWifiBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
