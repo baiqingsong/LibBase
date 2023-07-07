@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.IdRes;
 
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -29,6 +30,12 @@ import java.io.InputStream;
  */
 @SuppressWarnings("unused")
 public class LImageUtil {
+    /**
+     * 显示图片，不缓存
+     */
+    public static void displayNoCacheImage(Context context, String imgUrl, ImageView imageView){
+        Picasso.with(context).load(imgUrl).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(imageView);
+    }
     /**
      * 显示本地图片
      * @param imgRes 图片地址
