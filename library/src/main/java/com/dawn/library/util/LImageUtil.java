@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 /**
  * 图片展示工具类
@@ -57,6 +58,14 @@ public class LImageUtil {
      */
     public static void displayImage(Context context, String imgUrl, ImageView imageView){
         Glide.with(context).load(imgUrl).into(imageView);
+    }
+
+    public static void displayImageUrl(Context context, String imgUrl, ImageView imageView){
+        try {
+            Glide.with(context).load(new URL(imgUrl)).into(imageView);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
