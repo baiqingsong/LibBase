@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -49,14 +51,18 @@ public class LImageUtil {
         try {
             TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
                 @Override
-                public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                public void checkClientTrusted(X509Certificate[] chain, String authType) {
+
                 }
+
                 @Override
-                public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                public void checkServerTrusted(X509Certificate[] chain, String authType) {
+
                 }
+
                 @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return new java.security.cert.X509Certificate[]{};
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
                 }
             }};
             SSLContext sc = SSLContext.getInstance("TLS");
@@ -94,14 +100,6 @@ public class LImageUtil {
      */
     public static void displayImage(Context context, String imgUrl, ImageView imageView){
         Glide.with(context).load(imgUrl).into(imageView);
-    }
-
-    public static void displayImageUrl(Context context, String imgUrl, ImageView imageView){
-        try {
-            Glide.with(context).load(new URL(imgUrl)).into(imageView);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     /**
