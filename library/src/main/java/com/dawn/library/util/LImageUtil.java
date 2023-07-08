@@ -12,10 +12,12 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.widget.ImageView;
 
-import androidx.annotation.IdRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
+import androidx.annotation.RawRes;
 
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.ObjectKey;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,15 +36,15 @@ public class LImageUtil {
      * 显示图片，不缓存
      */
     public static void displayNoCacheImage(Context context, String imgUrl, ImageView imageView){
-        Picasso.with(context).load(imgUrl).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).into(imageView);
+        Glide.with(context).load(imgUrl).signature(new ObjectKey(System.currentTimeMillis())).into(imageView);
     }
     /**
      * 显示本地图片
      * @param imgRes 图片地址
      * @param imageView 控件
      */
-    public static void displayImage(Context context, @IdRes int imgRes, ImageView imageView){
-        Picasso.with(context).load(imgRes).into(imageView);
+    public static void displayImage(Context context, @RawRes @DrawableRes @Nullable Integer imgRes, ImageView imageView){
+        Glide.with(context).load(imgRes).into(imageView);
     }
 
     /**
@@ -54,7 +56,7 @@ public class LImageUtil {
      * @param imageView 控件
      */
     public static void displayImage(Context context, String imgUrl, ImageView imageView){
-        Picasso.with(context).load(imgUrl).into(imageView);
+        Glide.with(context).load(imgUrl).into(imageView);
     }
 
     /**
@@ -63,7 +65,7 @@ public class LImageUtil {
      * @param imageView 控件
      */
     public static void displayImage(Context context, Uri uri, ImageView imageView){
-        Picasso.with(context).load(uri).into(imageView);
+        Glide.with(context).load(uri).into(imageView);
     }
 
     /**
@@ -72,8 +74,8 @@ public class LImageUtil {
      * @param imageView 控件
      * @param imgDefault 默认图片
      */
-    public static void displayImage(Context context, String imgUrl, ImageView imageView, @IdRes int imgDefault){
-        Picasso.with(context).load(imgUrl).error(imgDefault).placeholder(imgDefault).into(imageView);
+    public static void displayImage(Context context, String imgUrl, ImageView imageView, @RawRes @DrawableRes @Nullable  Integer imgDefault){
+        Glide.with(context).load(imgUrl).error(imgDefault).placeholder(imgDefault).into(imageView);
     }
 
     /**
