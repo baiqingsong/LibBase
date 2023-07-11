@@ -1,5 +1,12 @@
 package com.dawn.library.util;
 
+import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
+
+import androidx.annotation.StringRes;
+
 import java.text.DecimalFormat;
 
 /**
@@ -610,5 +617,15 @@ public class LStringUtil {
         byte[] data = new byte[1];
         data[0] = temp;
         return toHexString(data);
+    }
+
+    /**
+     * 获取字符串
+     * @param resId strings.xml
+     */
+    public static String getResString(Context context, @StringRes int resId){
+        Resources resources = context.getResources();// 获得res资源对象
+        Configuration config = resources.getConfiguration();// 获得设置对象
+        return context.createConfigurationContext(config).getResources().getString(resId);
     }
 }
