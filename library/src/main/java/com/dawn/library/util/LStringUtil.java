@@ -623,9 +623,9 @@ public class LStringUtil {
      * 获取字符串
      * @param resId strings.xml
      */
-    public static String getResString(Context context, @StringRes int resId){
+    public static String getResString(Context context, @StringRes int resId, Object... formatArgs){
         Resources resources = context.getResources();// 获得res资源对象
         Configuration config = resources.getConfiguration();// 获得设置对象
-        return context.createConfigurationContext(config).getResources().getString(resId);
+        return context.createConfigurationContext(config).getResources().getString(resId, formatArgs);
     }
 }
