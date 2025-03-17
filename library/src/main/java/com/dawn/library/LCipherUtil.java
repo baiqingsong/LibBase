@@ -1,4 +1,4 @@
-package com.dawn.library.util;
+package com.dawn.library;
 
 import android.annotation.SuppressLint;
 import android.util.Base64;
