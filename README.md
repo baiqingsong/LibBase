@@ -65,6 +65,10 @@
 * updateALL 更新实体类集合
 * queryCount 查询实体类数量
 
+#### LDeviceUtil（完成）
+设备相关工具类
+* getDeviceId 获取设备id
+
 #### LFileUtil（完成）
 文件工具类
 * closeIO 关闭IO流
