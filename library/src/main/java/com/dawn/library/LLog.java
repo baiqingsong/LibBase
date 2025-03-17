@@ -1,4 +1,4 @@
-package com.dawn.library.util;
+package com.dawn.library;
 
 import android.content.Context;
 import android.os.Environment;
@@ -34,7 +34,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 @SuppressWarnings("unused")
 public class LLog {
-    private static String TAG = "ghost";
+    private static String TAG = "tag";
     private static boolean LOG_DEBUG = true;
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final int VERBOSE = 2;
@@ -55,11 +55,12 @@ public class LLog {
 
     private static String logPath = null;//log日志存放路径
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);//日期格式;
-    private static SimpleDateFormat dateFormat_log = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US);//日期格式;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);//日期格式;
+    private static final SimpleDateFormat dateFormat_log = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US);//日期格式;
 
     /**
-     * 初始化日志开关和TAG（默认之日为开，TAG为‘ghost’）
+     * 初始化日志开关和TAG（默认之日为开，TAG为‘tag’）
+     * @param context 上下文
      * @param isDebug 是否打印
      * @param tag 日志tag
      */
@@ -75,8 +76,7 @@ public class LLog {
      * @param msg 内容
      */
     public static void v(String msg) {
-        log(VERBOSE, null, msg);
-        writeToFile(CHAR_VERBOSE, "", msg);
+        v(TAG, msg);
     }
 
     /**
@@ -94,8 +94,7 @@ public class LLog {
      * @param msg 内容
      */
     public static void d(String msg) {
-        log(DEBUG, null, msg);
-        writeToFile(CHAR_DEBUG, "", msg);
+        d(TAG, msg);
     }
 
     /**
@@ -113,13 +112,22 @@ public class LLog {
      * @param msg 内容
      */
     public static void i(Object... msg) {
+        i(TAG, msg);
+    }
+
+    /**
+     * 带tag的INFO
+     * @param tag 标识
+     * @param msg 内容
+     */
+    public static void i(String tag, Object... msg) {
         StringBuilder sb = new StringBuilder();
         for (Object obj : msg) {
             sb.append(obj);
             sb.append(",");
         }
-        log(INFO, null, String.valueOf(sb));
-        writeToFile(CHAR_INFO, "", String.valueOf(sb));
+        log(INFO, tag, String.valueOf(sb));
+        writeToFile(CHAR_INFO, tag, String.valueOf(sb));
     }
 
     /**
@@ -127,8 +135,7 @@ public class LLog {
      * @param msg 内容
      */
     public static void w(String msg) {
-        log(WARN, null, msg);
-        writeToFile(CHAR_WARN, "", msg);
+        w(TAG, msg);
     }
 
     /**
@@ -146,37 +153,38 @@ public class LLog {
      * @param msg 内容
      */
     public static void e(String msg) {
-        msg = "报错：" + msg;
-        log(ERROR, null, msg);
-        writeToFile(CHAR_ERROR, "", msg);
+        e(TAG, msg);
     }
 
     /**
      * 带tag的ERROR
+     * @param tag 标识
+     * @param msg 内容
+     */
+    public static void e(String tag, String msg) {
+        log(ERROR, tag, msg);
+        writeToFile(CHAR_ERROR, tag, msg);
+    }
+
+    /**
+     * ERROR
      * @param msg 内容
      * @param tr 报错
      */
     public static void e(String msg, Throwable tr) {
-        String errorStr = msg + "\n" + tr.getMessage() + "\n" + getThrowableStr(tr);
-        log(ERROR, null, errorStr);
-        writeToFile(CHAR_ERROR, "", errorStr);
+        e(TAG, msg, tr);
     }
 
     /**
-     * ASSERT
-     * @param msg 内容
-     */
-    public static void a(String msg) {
-        log(ASSERT, null, msg);
-    }
-
-    /**
-     * 带tag的ASSERT
+     * 带tag的ERROR
      * @param tag 标识
      * @param msg 内容
+     * @param tr 报错
      */
-    public static void a(String tag, String msg) {
-        log(ASSERT, tag, msg);
+    public static void e(String tag, String msg, Throwable tr) {
+        String errorStr = msg + "\n" + tr.getMessage() + "\n" + getThrowableStr(tr);
+        log(ERROR, tag, errorStr);
+        writeToFile(CHAR_ERROR, tag, errorStr);
     }
 
     /**
@@ -184,7 +192,7 @@ public class LLog {
      * @param json 字符串
      */
     public static void json(String json) {
-        log(JSON, null, json);
+        json(TAG, json);
     }
 
     /**
@@ -201,7 +209,7 @@ public class LLog {
      * @param xml 字符串
      */
     public static void xml(String xml) {
-        log(XML, null, xml);
+        xml(TAG, xml);
     }
 
     /**
@@ -218,7 +226,7 @@ public class LLog {
      * @param e 报错
      */
     public static void exception(Exception e){
-        writeToFile(CHAR_ERROR, "", Log.getStackTraceString(e));
+        exception(TAG, e);
     }
 
     /**
@@ -570,7 +578,7 @@ public class LLog {
         String headString = contents[2];
         String fileName = getFileName(new Date());//log日志名，使用时间命名，保证不重复
 //        String log = dateFormat_log.format(new Date()) + " " + type + " " + tag + " " + msg + "\n";//log日志内容，可以自行定制
-        String log = dateFormat_log.format(new Date()) + " " + headString + "" + msg + "\n";
+        String log = dateFormat_log.format(new Date()) + " " + headString + " " + msg + "\n";
         checkFilePath(logPath);//检测文件夹，查看是否存在，是否占用内存过多
 
         FileOutputStream fos;//FileOutputStream会自动调用底层的close()方法，不用关闭

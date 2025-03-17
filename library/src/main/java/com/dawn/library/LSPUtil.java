@@ -1,4 +1,4 @@
-package com.dawn.library.util;
+package com.dawn.library;
 
 import android.content.Context;
 import android.content.SharedPreferences;
