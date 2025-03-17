@@ -1,4 +1,4 @@
-package com.dawn.library.util;
+package com.dawn.library;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

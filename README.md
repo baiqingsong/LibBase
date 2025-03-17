@@ -40,7 +40,7 @@
 * getDate 获取当前日期
 * getDateTime 获取当前日期时间
 
-#### LDBOperation
+#### LDBOperation（完成）
 数据库工具类，需要lite-orm
 * newSingleInstance 数据库的初始化，需要在application中调用
 * getLiteOrm 获取liteOrm实体类
@@ -91,63 +91,46 @@ json工具类
 * listToJson 集合转json
 * jsonToList json转集合
 
-#### LLogUtil
+#### LLog（完成）
 日志工具类
 * init 初始化
 * i 打印info级别的日志
 * e 打印error级别的日志
 
-#### LNetUtil
+#### LNetUtil（完成）
 网络工具类
 * getNetworkType 获取网络类型
-* getNetworkTypeName 获取网络类型名称
-* isConnected 判断网络是否连接
 * isNetworkAvailable 判断网络是否可用
-* isWiFi 判断是否是wifi连接
-* isWifiConnected 判断wifi是否连接
+* isWifi 是否是wifi
 * openNetSetting 打开网络设置界面
-* setWifiEnabled 设置wifi是否可用
-* getWifiScanResults 获取wifi列表
-* getScanResultsByBSSID 过滤扫描结果
-* getWifiConnectionInfo 获取wifi连接信息
-* ping 检测网络是否可用
-* changeWifi 切换WiFi
-* getWifiState 获取WiFi状态
+* setWifiEnabled 设置wifi开关
+* ping 检测网络是否连接
 
-#### LSPUtil
+#### LSPUtil（完成）
 SharedPreferences工具类
 * setSP 保存数据
 * getSp 获取数据
 * cleanAllSP 清除所有数据
 
-#### LStringUtil
+#### LStringUtil（完成）
 字符串工具类
-* getChsAscii 汉字转成ASCII码
-* convert 单字解析
-* getSelling 词组解析
-* parseEmpty 将null转化为""
-* isEmpty 是否是空字符串
-* chineseLength 中文长度
-* strLength 字符串长度
-* subStringLength 获取指定长度的字符所在位置
-* isChinese 是否是中文
-* isContainChinese 是否包含中文
-* strFormat2 不足2位前面补0
-* convert2Int 类型安全转换
-* decimalFormat 指定小数输出
-* str2HexStr 字符串转换成十六进制字符串
-* hexStr2Str 十六进制转换字符串
-* byte2HexStr bytes转换成十六进制字符串
-* hexStr2Bytes bytes字符串转换为Byte值
-* strToUnicode String的字符串转换成unicode的String
-* unicodeToString unicode的String转换成String的字符串
-* toHexString 字节数组转换成字符串
-* toByteArray 字符串转换成字节数组
+* parseEmpty 将null转换成空字符串
+* isEmpty 判断字符串是否为空
+* strLength 获取字符串的长度，中文算两个字符
+* isChinese 判断字符串是否是中文
+* isContainChinese 判断字符串是否包含中文
+* decimalFormat 保留小数点后几位
+* toHexString 字节数组转换成16进制字符串
+* toByteArray 16进制字符串转换成字节数组
+* format 十进制转换成十六进制
+* parseHex2Opposite 将16进制字符串转换成相反的字符串
+* getXor 获取异或值
 
-#### LSystemUtil
+#### LSystemUtil（完成）
 系统工具类
 * reboot 重启设备
 * openSettings 打开设置界面
-* hideKeyBoard 隐藏键盘
 * installApk 安装apk
+* showSoftInput 显示软键盘
+* hideSoftInput 隐藏软键盘
 
