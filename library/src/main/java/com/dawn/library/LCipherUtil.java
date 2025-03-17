@@ -149,7 +149,7 @@ public class LCipherUtil {
             while ((len = in.read(b)) > 0) {
                 messageDigest.update(b, 0, len);
             }
-            return LStringUtil.byte2HexStr(messageDigest.digest());
+            return LStringUtil.toHexString(messageDigest.digest());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (IOException e) {
