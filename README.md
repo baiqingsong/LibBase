@@ -1,50 +1,44 @@
 # LibBase
  基础工具类调用
 
-## 基类
-
-#### LBaseActivity
-页面的基类
-
-#### LBaseDialog
-弹窗的基类
-
-#### LBaseService
-服务的基类
-
-#### LBaseApplication
-Application的基类
-
 ## 工具类
 
-#### LAppUtil
+#### LAppUtil（完成）
 应用相关工具类
 * getVersionName 获取版本名称
 * getVersionCode 获取版本号
+* getAppSize 获取应用大小
+* installApk 安装apk
+* uninstallApk 卸载apk
+* runApp 运行应用
+* cleanCache 清除缓存
+* cleanDatabases 清除数据库
+* cleanSharedPreference 清除SharedPreferences
 
-#### LCipherUtil
+#### LCipherUtil（完成）
 密码工具类
+* encryptMD5 MD5加密
+* base64Encode Base64加密
+* base64Decode Base64解密
+* encryptSHA1 SHA1加密
+* XorEncode 异或加密
+* XorDecode 异或解密
+* encryptAES AES加密
+* decryptAES AES解密
 
 #### LCrashHandlerUtil
 崩溃日志工具类
 * init 初始化
 * setListener 设置监听
 
-#### LDateUtil
+#### LDateUtil（完成）
 日期工具类
-* formatDataTime 时间戳转换成日期时间格式
-* formatDate 时间戳转换成日期格式
-* formatTime 时间戳转换成时间格式
-* formatDateCustom 时间戳转换成自定义格式
-* formatDateCustom date格式转换成自定义格式
-* string2Date 字符串转换成date格式
+* longToDateTime 将时间戳转换成日期时间
+* longToDate 将时间戳转换成日期
+* longToTime 将时间戳转换成时间
 * getTime 获取当前时间
 * getDate 获取当前日期
 * getDateTime 获取当前日期时间
-* getDateTime 自定义格式获取当前日期时间
-* subtractDate 两个日期相减
-* getDateAfter 获取几天后的日期
-* long2Date 时间戳转换成date格式
 
 #### LDBOperation
 数据库工具类，需要lite-orm
@@ -71,50 +65,31 @@ Application的基类
 * updateALL 更新实体类集合
 * queryCount 查询实体类数量
 
-#### LFileUtil
+#### LFileUtil（完成）
 文件工具类
 * closeIO 关闭IO流
 * deleteFile 删除文件
 * deleteFileByDirectory 删除文件夹下的所有文件
+* clearDirectory 清空文件夹
 * isFileExist 判断文件是否存在
 * writeFile 将字符串写入到文件中
 * readFile 读取文件中的字符串
-* readFile 读取文件中的字符串,可编码
 * copyFile 复制文件
-* copyFileFast 快速复制文件
-* zip 压缩文件
-* unzip 解压文件
-* Stream2File 将输入流写入文件
-* createFolder 创建文件夹
+* streamToFile 将输入流写入文件
 * createFolder 创建文件夹,支持覆盖已存在的同名文件夹
 * getFileName 获取文件名
-* getFileSize 获取文件大小
-* rename 重命名文件
 * getFolderName 获取文件夹名称
+* getFileSize 获取文件大小
+* renameFile 重命名文件
 * getFilesArray 获取文件夹下的所有文件
-* deleteFiles 删除文件夹下的所有文件
 * fileToByteAry 文件转换成byte数组
 
-#### LImageUtil
-图片展示工具类
-* displayImage 显示本地图片
-* displayImage 显示网络图片，assets下图片，SD卡下图片
-* displayImage 显示Uri图片
-* saveBitmapToFile 保存图片到本地
-* bitmapToBase64 bitmap转换成base64
-* base64ToBitmap base64转换成bitmap
-* readBitmapFromAssets 读取assets下的图片
-* readBitmapFromFile 读取SD卡下的图片
-* adjustPhotoRotation 图片旋转
-
-#### LJsonUtil
+#### LJsonUtil（完成）
 json工具类
-* toJson 将对象转换成json字符串
-* fromJson 将json字符串转换成对象
-* map2Json 将map转换成json字符串
-* collection2Json 将集合转换成jsonArray字符串
-* object2Json 将对象转换成jsonArray字符串
-* string2JSONObject 将字符串转换成JSONObject
+* objToJson 对象转json
+* jsonToObj json转对象
+* listToJson 集合转json
+* jsonToList json转集合
 
 #### LLogUtil
 日志工具类
