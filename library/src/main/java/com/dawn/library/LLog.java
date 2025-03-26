@@ -394,6 +394,34 @@ public class LLog {
     }
 
     /**
+     * 获取log的信息，包括头，信息，方法名等显示信息
+     * @param tag 标识
+     * @param objects 内容
+     */
+    private static String[] wrapperContent(String tag, Object... objects) {
+        if (TextUtils.isEmpty(tag)) {
+            tag = TAG;
+        }
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        StackTraceElement targetElement = stackTrace[5];
+        String className = targetElement.getClassName();
+        className = className.replaceAll("\\$\\d", "");
+        String[] classNameInfo = className.split("\\.");
+        if (classNameInfo.length > 0) {
+            className = classNameInfo[classNameInfo.length - 1] + ".java";
+        }
+        String methodName = targetElement.getMethodName();
+        int lineNumber = targetElement.getLineNumber();
+        if (lineNumber < 0) {
+            lineNumber = 0;
+        }
+        String methodNameShort = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+        String msg = (objects == null) ? "Log with null object" : getObjectsString(objects);
+        String headString = "[(" + className + ":" + lineNumber + ")#" + methodNameShort + " ] ";
+        return new String[]{tag, msg, headString};
+    }
+
+    /**
      * 多条信息整理成一条字符串
      * @param objects 内容
      */
