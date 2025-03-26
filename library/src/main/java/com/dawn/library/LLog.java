@@ -112,7 +112,13 @@ public class LLog {
      * @param msg 内容
      */
     public static void i(Object... msg) {
-        i(TAG, msg);
+        StringBuilder sb = new StringBuilder();
+        for (Object obj : msg) {
+            sb.append(obj);
+            sb.append(",");
+        }
+        log(INFO, null, String.valueOf(sb));
+        writeToFile(CHAR_INFO, "", String.valueOf(sb));
     }
 
     /**
