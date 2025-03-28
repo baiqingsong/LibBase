@@ -76,7 +76,8 @@ public class LLog {
      * @param msg 内容
      */
     public static void v(String msg) {
-        v(TAG, msg);
+        log(VERBOSE, TAG, msg);
+        writeToFile(CHAR_VERBOSE, TAG, msg);
     }
 
     /**
@@ -94,7 +95,8 @@ public class LLog {
      * @param msg 内容
      */
     public static void d(String msg) {
-        d(TAG, msg);
+        log(DEBUG, TAG, msg);
+        writeToFile(CHAR_DEBUG, TAG, msg);
     }
 
     /**
@@ -126,7 +128,8 @@ public class LLog {
      * @param msg 内容
      */
     public static void w(String msg) {
-        w(TAG, msg);
+        log(WARN, TAG, msg);
+        writeToFile(CHAR_WARN, TAG, msg);
     }
 
     /**
@@ -144,7 +147,8 @@ public class LLog {
      * @param msg 内容
      */
     public static void e(String msg) {
-        e(TAG, msg);
+        log(ERROR, TAG, msg);
+        writeToFile(CHAR_ERROR, TAG, msg);
     }
 
     /**
@@ -163,7 +167,9 @@ public class LLog {
      * @param tr 报错
      */
     public static void e(String msg, Throwable tr) {
-        e(TAG, msg, tr);
+        String errorStr = msg + "\n" + tr.getMessage() + "\n" + getThrowableStr(tr);
+        log(ERROR, TAG, errorStr);
+        writeToFile(CHAR_ERROR, TAG, errorStr);
     }
 
     /**
@@ -183,7 +189,7 @@ public class LLog {
      * @param json 字符串
      */
     public static void json(String json) {
-        json(TAG, json);
+        log(JSON, TAG, json);
     }
 
     /**
@@ -200,7 +206,7 @@ public class LLog {
      * @param xml 字符串
      */
     public static void xml(String xml) {
-        xml(TAG, xml);
+        log(XML, TAG, xml);
     }
 
     /**
@@ -217,7 +223,7 @@ public class LLog {
      * @param e 报错
      */
     public static void exception(Exception e){
-        exception(TAG, e);
+        writeToFile(CHAR_ERROR, TAG, Log.getStackTraceString(e));
     }
 
     /**
