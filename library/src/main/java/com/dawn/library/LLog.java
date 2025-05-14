@@ -71,6 +71,17 @@ public class LLog {
         checkFilePath(logPath);
     }
 
+    public static void init(Context context, boolean isDebug, String tag, String logPath2){
+        TAG = tag;
+        LOG_DEBUG = isDebug;
+        if(TextUtils.isEmpty(logPath2)){
+            logPath = getFilePath(context);
+        }else{
+            logPath = logPath2;
+            checkFilePath(logPath);
+        }
+    }
+
     /**
      * VERBOSE
      * @param msg 内容
