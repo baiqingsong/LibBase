@@ -487,12 +487,17 @@ public class LLog {
      */
     @SuppressWarnings("WeakerAccess")
     public static String getFilePath(Context context) {
-        if ( !Environment.isExternalStorageRemovable()) {//如果外部储存可用
-            File file = context.getExternalFilesDir(null);
-            if(file != null && file.exists())
-                return file.getPath() + "/Logs/";//获得外部存储路径,默认路径为 /storage/emulated/Android/data/com.../files/Logs/log_2018-03-14.txt
-            else
-                return null;
+//        if ( !Environment.isExternalStorageRemovable()) {//如果外部储存可用
+//            File file = context.getExternalFilesDir(null);
+//            if(file != null && file.exists())
+//                return file.getPath() + "/Logs/";//获得外部存储路径,默认路径为 /storage/emulated/Android/data/com.../files/Logs/log_2018-03-14.txt
+//            else
+//                return null;
+//        } else {
+//            return context.getFilesDir().getPath() + "/Logs/";//直接存在/data/data里，非root手机是看不到的
+//        }
+        if (Environment.MEDIA_MOUNTED.equals(Environment.MEDIA_MOUNTED) || !Environment.isExternalStorageRemovable()) {//如果外部储存可用
+            return context.getExternalFilesDir(null).getPath() + "/Logs/";//获得外部存储路径,默认路径为 /storage/emulated/Android/data/com.../files/Logs/log_2018-03-14.txt
         } else {
             return context.getFilesDir().getPath() + "/Logs/";//直接存在/data/data里，非root手机是看不到的
         }
