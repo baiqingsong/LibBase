@@ -1,6 +1,7 @@
 package com.dawn.library;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +21,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -496,10 +498,15 @@ public class LLog {
 //        } else {
 //            return context.getFilesDir().getPath() + "/Logs/";//直接存在/data/data里，非root手机是看不到的
 //        }
-        if (Environment.MEDIA_MOUNTED.equals(Environment.MEDIA_MOUNTED) || !Environment.isExternalStorageRemovable()) {//如果外部储存可用
-            return context.getExternalFilesDir(null).getPath() + "/Logs/";//获得外部存储路径,默认路径为 /storage/emulated/Android/data/com.../files/Logs/log_2018-03-14.txt
+//        if (Environment.MEDIA_MOUNTED.equals(Environment.MEDIA_MOUNTED) || !Environment.isExternalStorageRemovable()) {//如果外部储存可用
+//            return context.getExternalFilesDir(null).getPath() + "/Logs/";//获得外部存储路径,默认路径为 /storage/emulated/Android/data/com.../files/Logs/log_2018-03-14.txt
+//        } else {
+//            return context.getFilesDir().getPath() + "/Logs/";//直接存在/data/data里，非root手机是看不到的
+//        }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            return Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath() + "/Logs/";
         } else {
-            return context.getFilesDir().getPath() + "/Logs/";//直接存在/data/data里，非root手机是看不到的
+            return context.getFilesDir().getAbsolutePath() + "/Logs/";
         }
     }
 
