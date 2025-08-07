@@ -48,4 +48,83 @@ public class LDeviceUtil {
         }
         return builder.toString();
     }
+
+    /**
+     * 获取CPU序列号
+     * @return CPU序列号
+     */
+    public static String getCpuSerial() {
+        try {
+            return loadFileAsString("/proc/cpuinfo").trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 获取内存信息
+     * @return 内存信息
+     */
+    public static String getMemInfo() {
+        try {
+            return loadFileAsString("/proc/meminfo").trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 获取系统版本信息
+     * @return 系统版本信息
+     */
+    public static String getSystemVersion() {
+        try {
+            return loadFileAsString("/proc/version").trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 获取WIFI MAC地址
+     * @return WIFI MAC地址
+     */
+    public static String getWifiMac() {
+        try {
+            String mac = loadFileAsString("/sys/class/net/wlan0/address");
+            if (mac != null) {
+                return mac.toUpperCase().trim();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 获取设备制造商
+     * @return 设备制造商
+     */
+    public static String getManufacturer() {
+        return android.os.Build.MANUFACTURER;
+    }
+
+    /**
+     * 获取设备型号
+     * @return 设备型号
+     */
+    public static String getModel() {
+        return android.os.Build.MODEL;
+    }
+
+    /**
+     * 获取设备品牌
+     * @return 设备品牌
+     */
+    public static String getBrand() {
+        return android.os.Build.BRAND;
+    }
 }

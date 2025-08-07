@@ -83,4 +83,73 @@ public class LDateUtil {
         return new SimpleDateFormat(format, Locale.US).format(System.currentTimeMillis());
     }
 
+    /**
+     * 日期字符串转时间戳
+     * @param dateTime 日期时间字符串 格式：yyyy-MM-dd HH:mm:ss
+     * @return 时间戳
+     */
+    public static long dateTimeToLong(String dateTime) {
+        try {
+            return DATE_FORMAT_DATETIME.parse(dateTime).getTime();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 日期字符串转时间戳
+     * @param date 日期字符串 格式：yyyy-MM-dd
+     * @return 时间戳
+     */
+    public static long dateToLong(String date) {
+        try {
+            return DATE_FORMAT_DATE.parse(date).getTime();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * 获取当前时间戳
+     * @return 当前时间戳（毫秒）
+     */
+    public static long getCurrentTimeMillis() {
+        return System.currentTimeMillis();
+    }
+
+    /**
+     * 获取两个日期之间的天数差
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @return 天数差
+     */
+    public static int getDaysBetween(long startDate, long endDate) {
+        return (int) ((endDate - startDate) / (24 * 60 * 60 * 1000));
+    }
+
+    /**
+     * 判断是否为今天
+     * @param timestamp 时间戳
+     * @return 是否为今天
+     */
+    public static boolean isToday(long timestamp) {
+        String today = longToDate(System.currentTimeMillis());
+        String target = longToDate(timestamp);
+        return today.equals(target);
+    }
+
+    /**
+     * 获取星期几
+     * @param timestamp 时间戳
+     * @return 星期几 (1-7，1表示星期一)
+     */
+    public static int getDayOfWeek(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        return dayOfWeek == 1 ? 7 : dayOfWeek - 1; // 调整为1-7，1表示星期一
+    }
+
 }

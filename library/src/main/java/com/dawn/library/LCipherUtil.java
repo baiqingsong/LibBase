@@ -272,5 +272,107 @@ public class LCipherUtil {
         return cipher.doFinal(data);
     }
 
+    /**
+     * CRC32校验
+     * @param data 数据
+     * @return CRC32校验值
+     */
+    public static long crc32(byte[] data) {
+        java.util.zip.CRC32 crc32 = new java.util.zip.CRC32();
+        crc32.update(data);
+        return crc32.getValue();
+    }
+
+    /**
+     * CRC32校验
+     * @param str 字符串
+     * @return CRC32校验值
+     */
+    public static long crc32(String str) {
+        try {
+            return crc32(str.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * SHA256加密
+     * @param str 需要加密的字符串
+     * @return SHA256加密后的字符串
+     */
+    public static String encryptSHA256(String str) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(str.getBytes("UTF-8"));
+            byte[] hash = digest.digest();
+            return LStringUtil.toHexString(hash);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * SHA512加密
+     * @param str 需要加密的字符串
+     * @return SHA512加密后的字符串
+     */
+    public static String encryptSHA512(String str) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-512");
+            digest.update(str.getBytes("UTF-8"));
+            byte[] hash = digest.digest();
+            return LStringUtil.toHexString(hash);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 生成指定长度的随机字符串（用于密钥生成）
+     * @param length 长度
+     * @return 随机字符串
+     */
+    public static String generateRandomString(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        java.util.Random random = new java.util.Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * URL编码
+     * @param str 需要编码的字符串
+     * @return URL编码后的字符串
+     */
+    public static String urlEncode(String str) {
+        try {
+            return java.net.URLEncoder.encode(str, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return str;
+        }
+    }
+
+    /**
+     * URL解码
+     * @param str 需要解码的字符串
+     * @return URL解码后的字符串
+     */
+    public static String urlDecode(String str) {
+        try {
+            return java.net.URLDecoder.decode(str, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return str;
+        }
+    }
+
 
 }

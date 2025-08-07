@@ -192,4 +192,119 @@ public class LStringUtil {
         return toHexString(data);
     }
 
+    /**
+     * 首字母转大写
+     * @param str 需要转换的字符串
+     * @return 首字母大写的字符串
+     */
+    public static String capitalizeFirst(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    /**
+     * 首字母转小写
+     * @param str 需要转换的字符串
+     * @return 首字母小写的字符串
+     */
+    public static String lowercaseFirst(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+
+    /**
+     * 驼峰转下划线
+     * @param str 驼峰字符串
+     * @return 下划线分隔的字符串
+     */
+    public static String camelToUnderline(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        return str.replaceAll("([A-Z])", "_$1").toLowerCase();
+    }
+
+    /**
+     * 下划线转驼峰
+     * @param str 下划线分隔的字符串
+     * @return 驼峰字符串
+     */
+    public static String underlineToCamel(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        StringBuilder result = new StringBuilder();
+        String[] parts = str.split("_");
+        for (int i = 0; i < parts.length; i++) {
+            if (i == 0) {
+                result.append(parts[i].toLowerCase());
+            } else {
+                result.append(capitalizeFirst(parts[i].toLowerCase()));
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * 判断字符串是否为数字
+     * @param str 判断的字符串
+     * @return 是否为数字
+     */
+    public static boolean isNumeric(String str) {
+        if (isEmpty(str)) {
+            return false;
+        }
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 判断字符串是否为整数
+     * @param str 判断的字符串
+     * @return 是否为整数
+     */
+    public static boolean isInteger(String str) {
+        if (isEmpty(str)) {
+            return false;
+        }
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
+     * 移除字符串中的空格
+     * @param str 需要处理的字符串
+     * @return 移除空格后的字符串
+     */
+    public static String removeSpaces(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        return str.replaceAll("\\s+", "");
+    }
+
+    /**
+     * 反转字符串
+     * @param str 需要反转的字符串
+     * @return 反转后的字符串
+     */
+    public static String reverse(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        return new StringBuilder(str).reverse().toString();
+    }
+
 }

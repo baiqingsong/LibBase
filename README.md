@@ -1,140 +1,213 @@
-# LibBase
- 基础工具类调用
+# LibBase工具类库说明文档
 
-## 工具类
+## 概述
+LibBase是一个Android实用工具类库，包含了常用的工具类和方法，旨在提高Android开发效率。
 
-#### LAppUtil（完成）
-应用相关工具类
-* getVersionName 获取版本名称
-* getVersionCode 获取版本号
-* getAppSize 获取应用大小
-* installApk 安装apk
-* uninstallApk 卸载apk
-* runApp 运行应用
-* cleanCache 清除缓存
-* cleanDatabases 清除数据库
-* cleanSharedPreference 清除SharedPreferences
+## 工具类列表
 
-#### LCipherUtil（完成）
-密码工具类
-* encryptMD5 MD5加密
-* base64Encode Base64加密
-* base64Decode Base64解密
-* encryptSHA1 SHA1加密
-* XorEncode 异或加密
-* XorDecode 异或解密
-* encryptAES AES加密
-* decryptAES AES解密
+### 1. LJsonUtil - JSON工具类
+**依赖**: Gson库
+**功能**: JSON与对象之间的转换
+- `objToJson()` - 对象转JSON字符串
+- `jsonToObj()` - JSON字符串转对象
+- `listToJson()` - 集合转JSON字符串
+- `jsonToList()` - JSON字符串转集合
 
-#### LCrashHandlerUtil
-崩溃日志工具类
-* init 初始化
-* setListener 设置监听
+### 2. LFileUtil - 文件工具类
+**功能**: 文件和文件夹操作
+- 文件删除、创建、重命名、复制
+- 文件读写操作
+- 文件大小获取和计算
+- 文件格式判断
+- 字节数组与文件互转
+- **新增方法**:
+    - `getFileExtension()` - 获取文件扩展名
+    - `getFileNameWithoutExtension()` - 获取不含扩展名的文件名
+    - `createFile()` - 创建文件
+    - `readFileAll()` - 读取文件所有内容
+    - `byteAryToFile()` - 字节数组写入文件
+    - `getFolderSize()` - 计算文件夹大小
 
-#### LDateUtil（完成）
-日期工具类
-* longToDateTime 将时间戳转换成日期时间
-* longToDate 将时间戳转换成日期
-* longToTime 将时间戳转换成时间
-* getTime 获取当前时间
-* getDate 获取当前日期
-* getDateTime 获取当前日期时间
+### 3. LDeviceUtil - 设备工具类
+**功能**: 获取设备相关信息
+- `getDeviceId()` - 获取设备ID（基于网卡地址）
+- `loadFileAsString()` - 读取系统文件内容
+- **新增方法**:
+    - `getCpuSerial()` - 获取CPU序列号
+    - `getMemInfo()` - 获取内存信息
+    - `getSystemVersion()` - 获取系统版本信息
+    - `getWifiMac()` - 获取WIFI MAC地址
+    - `getManufacturer()` - 获取设备制造商
+    - `getModel()` - 获取设备型号
+    - `getBrand()` - 获取设备品牌
 
-#### LDBOperation（完成）
-数据库工具类，需要lite-orm
-* newSingleInstance 数据库的初始化，需要在application中调用
-* getLiteOrm 获取liteOrm实体类
-* insert 插入，传入实体类
-* insertAll 插入，传入实体类的集合
-* queryAll 查询所有，返回实体类集合
-* queryByWhere 按照条件查询，返回实体类集合
-* queryByWhere 多条件查询，返回实体类集合
-* queryByWhereTwo 两个条件查询，返回实体类集合
-* queryByWhereLength 分页查询，多个条件查询，返回实体类集合
-* queryByWhereLength 分页查询，单个条件查询，返回实体类集合
-* queryByWhereOrder 按照条件查询，并且排序
-* deleteWhere 根据条件删除，多个条件
-* deleteWhere 根据条件删除，单个条件
-* delete 删除实体类
-* deleteAll 删除所有的类
-* deleteDatabase 删除数据库，包括文件
-* reCreateDatabase 重建数据库
-* deleteSection 删除某个区间的数据
-* deleteList 删除实体类列表
-* update 更新实体类
-* updateALL 更新实体类集合
-* queryCount 查询实体类数量
+### 4. LDBOperationUtil - 数据库操作工具类
+**依赖**: LiteOrm库
+**功能**: 数据库CRUD操作的封装
+- 数据库初始化和配置
+- 增删改查操作
+- 分页查询、条件查询
+- 数据库管理和维护
 
-#### LDeviceUtil（完成）
-设备相关工具类
-* getDeviceId 获取设备id
+### 5. LDateUtil - 日期工具类
+**功能**: 日期时间处理
+- 时间戳与日期字符串互转
+- 获取当前时间/日期
+- 自定义格式日期转换
+- **新增方法**:
+    - `dateTimeToLong()` - 日期字符串转时间戳
+    - `dateToLong()` - 日期字符串转时间戳
+    - `getCurrentTimeMillis()` - 获取当前时间戳
+    - `getDaysBetween()` - 获取两个日期之间的天数差
+    - `isToday()` - 判断是否为今天
+    - `getDayOfWeek()` - 获取星期几
 
-#### LFileUtil（完成）
-文件工具类
-* closeIO 关闭IO流
-* deleteFile 删除文件
-* deleteFileByDirectory 删除文件夹下的所有文件
-* clearDirectory 清空文件夹
-* isFileExist 判断文件是否存在
-* writeFile 将字符串写入到文件中
-* readFile 读取文件中的字符串
-* copyFile 复制文件
-* streamToFile 将输入流写入文件
-* createFolder 创建文件夹,支持覆盖已存在的同名文件夹
-* getFileName 获取文件名
-* getFolderName 获取文件夹名称
-* getFileSize 获取文件大小
-* renameFile 重命名文件
-* getFilesArray 获取文件夹下的所有文件
-* fileToByteAry 文件转换成byte数组
+### 6. LCrashHandlerUtil - 崩溃处理工具类
+**功能**: 应用崩溃信息收集和处理
+- 自动捕获未处理异常
+- 异常信息写入本地文件
+- 设备信息收集
+- 异常日志文件管理
+- 支持自定义异常处理回调
 
-#### LJsonUtil（完成）
-json工具类
-* objToJson 对象转json
-* jsonToObj json转对象
-* listToJson 集合转json
-* jsonToList json转集合
+### 7. LCipherUtil - 加密工具类
+**功能**: 各种加密解密算法
+- MD5、SHA1、SHA256、SHA512加密
+- Base64编码解码
+- AES对称加密解密
+- 异或加密解密
+- **新增方法**:
+    - `crc32()` - CRC32校验
+    - `encryptSHA256()` - SHA256加密
+    - `encryptSHA512()` - SHA512加密
+    - `generateRandomString()` - 生成随机字符串
+    - `urlEncode()` / `urlDecode()` - URL编码解码
 
-#### LLog（完成）
-日志工具类
-* init 初始化
-* i 打印info级别的日志
-* e 打印error级别的日志
+### 8. LAppUtil - 应用工具类
+**功能**: 应用管理相关操作
+- 获取应用版本信息
+- 应用安装卸载（已标记为过时）
+- 应用启动
+- 缓存清理（已标记为过时）
 
-#### LNetUtil（完成）
-网络工具类
-* getNetworkType 获取网络类型
-* isNetworkAvailable 判断网络是否可用
-* isWifi 是否是wifi
-* openNetSetting 打开网络设置界面
-* setWifiEnabled 设置wifi开关
-* ping 检测网络是否连接
+### 9. LLog - 日志工具类
+**功能**: 日志输出和文件保存
+- 多级别日志输出（V/D/I/W/E）
+- 日志写入本地文件
+- JSON/XML格式化输出
+- 日志文件大小管理
+- 异常信息记录
 
-#### LSPUtil（完成）
-SharedPreferences工具类
-* setSP 保存数据
-* getSp 获取数据
-* cleanAllSP 清除所有数据
+### 10. LSystemUtil - 系统工具类
+**功能**: 系统级操作和信息获取
+- 软键盘显示/隐藏
+- 系统设置页面打开
+- APK安装
+- **新增方法**:
+    - `getScreenWidth/Height()` - 获取屏幕尺寸
+    - `getScreenDensity()` - 获取屏幕密度
+    - `dp2px/px2dp()` - 像素单位转换
+    - `sp2px/px2sp()` - 字体单位转换
+    - `getStatusBarHeight()` - 获取状态栏高度
+    - `getNavigationBarHeight()` - 获取导航栏高度
+    - `copyToClipboard()` - 复制到剪贴板
+    - `getFromClipboard()` - 从剪贴板获取
+    - `openDialer()` - 打开拨号界面
+    - `sendSMS()` - 发送短信
 
-#### LStringUtil（完成）
-字符串工具类
-* parseEmpty 将null转换成空字符串
-* isEmpty 判断字符串是否为空
-* strLength 获取字符串的长度，中文算两个字符
-* isChinese 判断字符串是否是中文
-* isContainChinese 判断字符串是否包含中文
-* decimalFormat 保留小数点后几位
-* toHexString 字节数组转换成16进制字符串
-* toByteArray 16进制字符串转换成字节数组
-* format 十进制转换成十六进制
-* parseHex2Opposite 将16进制字符串转换成相反的字符串
-* getXor 获取异或值
+### 11. LStringUtil - 字符串工具类
+**功能**: 字符串处理和格式化
+- 空字符串判断和处理
+- 中文字符判断
+- 数字格式化
+- 十六进制转换
+- **新增方法**:
+    - `capitalizeFirst()` - 首字母大写
+    - `lowercaseFirst()` - 首字母小写
+    - `camelToUnderline()` - 驼峰转下划线
+    - `underlineToCamel()` - 下划线转驼峰
+    - `isNumeric()` - 判断是否为数字
+    - `isInteger()` - 判断是否为整数
+    - `removeSpaces()` - 移除空格
+    - `reverse()` - 反转字符串
 
-#### LSystemUtil（完成）
-系统工具类
-* reboot 重启设备
-* openSettings 打开设置界面
-* installApk 安装apk
-* showSoftInput 显示软键盘
-* hideSoftInput 隐藏软键盘
+### 12. LSPUtil - SharedPreferences工具类
+**功能**: 简化SP数据存储操作
+- 支持多种数据类型的存储/读取
+- 自动类型识别
+- **新增方法**:
+    - `removeSP()` - 清除指定key
+    - `containsKey()` - 检查是否包含指定key
+    - `getAllKeys()` - 获取所有key
+    - 支持自定义SP文件名的方法重载
 
+### 13. LNetUtil - 网络工具类
+**功能**: 网络状态检测和管理
+- 网络类型检测
+- 网络可用性判断
+- WiFi状态管理
+- 网络连通性测试
+- **新增方法**:
+    - `getNetworkTypeName()` - 获取网络类型名称
+    - `isMobileNetwork()` - 是否是移动网络
+    - `getWifiSignalStrength()` - 获取WiFi信号强度
+    - `getCurrentWifiName()` - 获取当前WiFi名称
+    - `getLocalIPAddress()` - 获取本机IP地址
+    - `simplePing()` - 简单ping测试
+    - `isPortReachable()` - 检查端口连通性
+
+### 14. LValidateUtil - 验证工具类 ⭐新增
+**功能**: 常用数据格式验证和格式化
+- 邮箱、手机号、身份证号验证
+- URL、IP地址验证
+- 密码强度验证
+- 银行卡号、车牌号验证
+- QQ号、微信号验证
+- 敏感信息格式化显示
+
+### 15. LColorUtil - 颜色工具类 ⭐新增
+**功能**: 颜色处理和转换
+- 颜色值与十六进制字符串互转
+- RGB/ARGB颜色值生成
+- 颜色分量提取
+- 颜色混合和变换
+- 深浅色判断
+- 随机颜色生成
+
+## 使用建议
+
+### 1. 初始化
+在Application中初始化必要的工具类：
+```java
+// 日志工具初始化
+LLog.init(context, BuildConfig.DEBUG, "YourTag");
+
+// 崩溃处理初始化
+LCrashHandlerUtil.getInstance().init(context);
+
+// 数据库初始化（如果使用）
+LDBOperationUtil.newSingleInstance(context, "your_db_name", BuildConfig.DEBUG);
+```
+
+### 2. 权限要求
+某些工具类需要相应的Android权限：
+- LNetUtil: 需要网络权限
+- LSystemUtil: 部分方法需要系统权限
+- LCrashHandlerUtil: 需要存储权限
+- LLog: 需要存储权限
+
+### 3. 依赖管理
+- LJsonUtil 需要添加 Gson 依赖
+- LDBOperationUtil 需要添加 LiteOrm 依赖
+
+### 4. 注意事项
+- 标记为 @Deprecated 的方法建议使用新的API替代
+- 部分方法在高版本Android系统中可能需要适配
+- 文件操作相关方法注意权限检查
+
+## 版本更新
+- **V1.0**: 基础工具类
+- **V1.1**: 新增 LValidateUtil 和 LColorUtil，优化现有工具类，增加常用方法
+
+## 贡献
+欢迎提交Issue和Pull Request来完善这个工具库。

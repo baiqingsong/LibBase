@@ -76,4 +76,154 @@ public class LSystemUtil {
             return;
         inputMethodManager.hideSoftInputFromWindow(iBinder, InputMethodManager.HIDE_NOT_ALWAYS);
     }
+
+    /**
+     * 获取屏幕宽度
+     * @param context 上下文
+     * @return 屏幕宽度（像素）
+     */
+    public static int getScreenWidth(Context context) {
+        return context.getResources().getDisplayMetrics().widthPixels;
+    }
+
+    /**
+     * 获取屏幕高度
+     * @param context 上下文
+     * @return 屏幕高度（像素）
+     */
+    public static int getScreenHeight(Context context) {
+        return context.getResources().getDisplayMetrics().heightPixels;
+    }
+
+    /**
+     * 获取屏幕密度
+     * @param context 上下文
+     * @return 屏幕密度
+     */
+    public static float getScreenDensity(Context context) {
+        return context.getResources().getDisplayMetrics().density;
+    }
+
+    /**
+     * dp转px
+     * @param context 上下文
+     * @param dpValue dp值
+     * @return px值
+     */
+    public static int dp2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    /**
+     * px转dp
+     * @param context 上下文
+     * @param pxValue px值
+     * @return dp值
+     */
+    public static int px2dp(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
+    }
+
+    /**
+     * sp转px
+     * @param context 上下文
+     * @param spValue sp值
+     * @return px值
+     */
+    public static int sp2px(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
+    }
+
+    /**
+     * px转sp
+     * @param context 上下文
+     * @param pxValue px值
+     * @return sp值
+     */
+    public static int px2sp(Context context, float pxValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (pxValue / fontScale + 0.5f);
+    }
+
+    /**
+     * 获取状态栏高度
+     * @param context 上下文
+     * @return 状态栏高度
+     */
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    /**
+     * 获取导航栏高度
+     * @param context 上下文
+     * @return 导航栏高度
+     */
+    public static int getNavigationBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    /**
+     * 复制文本到剪贴板
+     * @param context 上下文
+     * @param text 要复制的文本
+     */
+    public static void copyToClipboard(Context context, String text) {
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("text", text);
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+        }
+    }
+
+    /**
+     * 从剪贴板获取文本
+     * @param context 上下文
+     * @return 剪贴板文本
+     */
+    public static String getFromClipboard(Context context) {
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard != null && clipboard.hasPrimaryClip()) {
+            android.content.ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+            return item.getText().toString();
+        }
+        return "";
+    }
+
+    /**
+     * 打开拨号界面
+     * @param context 上下文
+     * @param phoneNumber 电话号码
+     */
+    public static void openDialer(Context context, String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phoneNumber));
+        context.startActivity(intent);
+    }
+
+    /**
+     * 发送短信
+     * @param context 上下文
+     * @param phoneNumber 电话号码
+     * @param message 短信内容
+     */
+    public static void sendSMS(Context context, String phoneNumber, String message) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("smsto:" + phoneNumber));
+        intent.putExtra("sms_body", message);
+        context.startActivity(intent);
+    }
 }

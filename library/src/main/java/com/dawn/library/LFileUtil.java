@@ -323,4 +323,136 @@ public class LFileUtil {
         }
         return data;
     }
+
+    /**
+     * 字节数组写入文件
+     * @param data 字节数组
+     * @param file 目标文件
+     * @return 是否写入成功
+     */
+    public static boolean byteAryToFile(byte[] data, File file) {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(data);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeIO(fos);
+        }
+    }
+
+    /**
+     * 获取文件扩展名
+     * @param filePath 文件路径
+     * @return 文件扩展名（不含点）
+     */
+    public static String getFileExtension(String filePath) {
+        if (LStringUtil.isEmpty(filePath)) {
+            return "";
+        }
+        int lastDotIndex = filePath.lastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < filePath.length() - 1) {
+            return filePath.substring(lastDotIndex + 1);
+        }
+        return "";
+    }
+
+    /**
+     * 获取不含扩展名的文件名
+     * @param filePath 文件路径
+     * @return 不含扩展名的文件名
+     */
+    public static String getFileNameWithoutExtension(String filePath) {
+        String fileName = getFileName(filePath);
+        if (LStringUtil.isEmpty(fileName)) {
+            return fileName;
+        }
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+            return fileName.substring(0, lastDotIndex);
+        }
+        return fileName;
+    }
+
+    /**
+     * 创建文件
+     * @param filePath 文件路径
+     * @return 是否创建成功
+     */
+    public static boolean createFile(String filePath) {
+        if (LStringUtil.isEmpty(filePath)) {
+            return false;
+        }
+        File file = new File(filePath);
+        if (file.exists()) {
+            return true;
+        }
+        // 创建父目录
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            if (!parentDir.mkdirs()) {
+                return false;
+            }
+        }
+        try {
+            return file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 读取文件所有内容
+     * @param filePath 文件路径
+     * @return 文件内容
+     */
+    public static String readFileAll(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return null;
+        }
+        
+        BufferedReader bufferedReader = null;
+        StringBuilder content = new StringBuilder();
+        try {
+            bufferedReader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeIO(bufferedReader);
+        }
+        return content.toString();
+    }
+
+    /**
+     * 计算文件夹大小
+     * @param directory 文件夹
+     * @return 文件夹大小（字节）
+     */
+    public static long getFolderSize(File directory) {
+        if (!directory.exists() || !directory.isDirectory()) {
+            return 0;
+        }
+        
+        long size = 0;
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    size += getFolderSize(file);
+                } else {
+                    size += file.length();
+                }
+            }
+        }
+        return size;
+    }
 }
