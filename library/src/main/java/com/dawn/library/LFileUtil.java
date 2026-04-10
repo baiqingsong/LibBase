@@ -59,7 +59,9 @@ public class LFileUtil {
     public static boolean deleteFileByDirectory(File directory) {
         if (directory.exists() && directory.isDirectory()) {
             boolean isSuccess = true;
-            for (File file : directory.listFiles()) {
+            File[] files = directory.listFiles();
+            if (files == null) return true;
+            for (File file : files) {
                 boolean singleSuccess = file.delete();
                 if (!singleSuccess) {
                     isSuccess = false;
@@ -90,11 +92,14 @@ public class LFileUtil {
         if (!file.isDirectory()) {
             return false;
         }
-        for (File f : file.listFiles()) {
-            if (f.isFile()) {
-                f.delete();
-            } else if (f.isDirectory()) {
-                deleteFile(f.getAbsolutePath());
+        File[] files = file.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.isFile()) {
+                    f.delete();
+                } else if (f.isDirectory()) {
+                    clearDirectory(f.getAbsolutePath());
+                }
             }
         }
         return file.delete();
@@ -134,26 +139,35 @@ public class LFileUtil {
     }
 
     /**
-     * 从文件中读取字符串
+     * 从文件中读取第一行字符串
      * @param filename 文件名称
      *
      * @return 读取的字符串
      */
     public static String readFile(String filename) {
+        if (LStringUtil.isEmpty(filename)) {
+            return null;
+        }
         File file = new File(filename);
         BufferedReader bufferedReader = null;
-        String str = null;
+        StringBuilder content = new StringBuilder();
         try {
             if (file.exists()) {
                 bufferedReader = new BufferedReader(new FileReader(filename));
-                str = bufferedReader.readLine();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (content.length() > 0) {
+                        content.append("\n");
+                    }
+                    content.append(line);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             closeIO(bufferedReader);
         }
-        return str;
+        return content.length() > 0 ? content.toString() : null;
     }
 
     /**
@@ -162,18 +176,22 @@ public class LFileUtil {
      * @param outFile 输出文件
      */
     public static void copyFile(File inFile, File outFile) {
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
         FileChannel filein = null;
         FileChannel fileout = null;
         try {
-            filein = new FileInputStream(inFile).getChannel();
-            fileout = new FileOutputStream(outFile).getChannel();
+            fis = new FileInputStream(inFile);
+            fos = new FileOutputStream(outFile);
+            filein = fis.getChannel();
+            fileout = fos.getChannel();
             filein.transferTo(0, filein.size(), fileout);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            closeIO(filein, fileout);
+            closeIO(filein, fileout, fis, fos);
         }
     }
 
@@ -454,5 +472,126 @@ public class LFileUtil {
             }
         }
         return size;
+    }
+
+    /**
+     * 格式化文件大小为可读字符串
+     * @param size 文件大小（字节）
+     * @return 格式化后的字符串（如 "1.5 MB"）
+     */
+    public static String formatFileSize(long size) {
+        if (size <= 0) return "0 B";
+        final String[] units = {"B", "KB", "MB", "GB", "TB"};
+        int unitIndex = 0;
+        double fileSize = size;
+        while (fileSize >= 1024 && unitIndex < units.length - 1) {
+            fileSize /= 1024;
+            unitIndex++;
+        }
+        return String.format(java.util.Locale.getDefault(), "%.2f %s", fileSize, units[unitIndex]);
+    }
+
+    /**
+     * 获取文件MIME类型
+     * @param filePath 文件路径
+     * @return MIME类型
+     */
+    public static String getMimeType(String filePath) {
+        String extension = getFileExtension(filePath);
+        if (extension.isEmpty()) return "application/octet-stream";
+        String mimeType = android.webkit.MimeTypeMap.getSingleton()
+                .getMimeTypeFromExtension(extension.toLowerCase());
+        return mimeType != null ? mimeType : "application/octet-stream";
+    }
+
+    /**
+     * 判断文件是否为图片
+     * @param filePath 文件路径
+     * @return 是否为图片文件
+     */
+    public static boolean isImageFile(String filePath) {
+        String mimeType = getMimeType(filePath);
+        return mimeType.startsWith("image/");
+    }
+
+    /**
+     * 判断文件是否为视频
+     * @param filePath 文件路径
+     * @return 是否为视频文件
+     */
+    public static boolean isVideoFile(String filePath) {
+        String mimeType = getMimeType(filePath);
+        return mimeType.startsWith("video/");
+    }
+
+    /**
+     * 判断文件是否为音频
+     * @param filePath 文件路径
+     * @return 是否为音频文件
+     */
+    public static boolean isAudioFile(String filePath) {
+        String mimeType = getMimeType(filePath);
+        return mimeType.startsWith("audio/");
+    }
+
+    /**
+     * 移动文件
+     * @param srcFile 源文件
+     * @param destFile 目标文件
+     * @return 是否移动成功
+     */
+    public static boolean moveFile(File srcFile, File destFile) {
+        if (srcFile == null || !srcFile.exists()) return false;
+        // 尝试直接重命名（同一分区下更高效）
+        if (srcFile.renameTo(destFile)) return true;
+        // 不同分区则复制后删除
+        copyFile(srcFile, destFile);
+        if (destFile.exists()) {
+            return srcFile.delete();
+        }
+        return false;
+    }
+
+    /**
+     * 递归获取文件夹下的所有文件数量
+     * @param path 文件夹路径
+     * @return 文件数量
+     */
+    public static int getFileCount(String path) {
+        File file = new File(path);
+        if (!file.exists()) return 0;
+        if (file.isFile()) return 1;
+        File[] files = file.listFiles();
+        if (files == null) return 0;
+        int count = 0;
+        for (File f : files) {
+            if (f.isFile()) {
+                count++;
+            } else if (f.isDirectory()) {
+                count += getFileCount(f.getAbsolutePath());
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 追加内容到文件末尾
+     * @param content 追加的内容
+     * @param filePath 文件路径
+     * @return 是否追加成功
+     */
+    public static boolean appendFile(String content, String filePath) {
+        return writeFile(content, filePath, true);
+    }
+
+    /**
+     * 读取文件为字节数组
+     * @param filePath 文件路径
+     * @return 字节数组
+     */
+    public static byte[] readFileToBytes(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) return null;
+        return fileToByteAry(file);
     }
 }

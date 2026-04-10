@@ -11,6 +11,8 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 public class LJsonUtil {
+    private static final Gson GSON = new Gson();
+
     /**
      * 对象转json
      * @param obj 实体类或集合
@@ -20,8 +22,12 @@ public class LJsonUtil {
     public static String objToJson(Object obj) {
         if(obj == null)
             return "";
-        Gson gson = new Gson();
-        return gson.toJson(obj);
+        try {
+            return GSON.toJson(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     /**
@@ -32,10 +38,14 @@ public class LJsonUtil {
      * @return 实体类
      */
     public static <T> T jsonToObj(String str, Class<T> type) {
-        if(str == null)
+        if(str == null || str.isEmpty())
             return null;
-        Gson gson = new Gson();
-        return gson.fromJson(str, type);
+        try {
+            return GSON.fromJson(str, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -47,8 +57,12 @@ public class LJsonUtil {
     public static <T> String listToJson(List<T> list) {
         if (list == null || list.isEmpty())
             return "[]";
-        Gson gson = new Gson();
-        return gson.toJson(list);
+        try {
+            return GSON.toJson(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "[]";
+        }
     }
 
     /**
@@ -59,11 +73,15 @@ public class LJsonUtil {
      * @return 实体类集合
      */
     public static <T> List<T> jsonToList(String json, Class<T> clazz) {
-        if (json == null)
+        if (json == null || json.isEmpty())
             return null;
-        Type type = TypeToken.getParameterized(ArrayList.class, clazz).getType();
-        Gson gson = new Gson();
-        return gson.fromJson(json, type);
+        try {
+            Type type = TypeToken.getParameterized(ArrayList.class, clazz).getType();
+            return GSON.fromJson(json, type);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

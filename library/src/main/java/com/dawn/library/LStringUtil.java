@@ -39,7 +39,7 @@ public class LStringUtil {
      */
     public static int strLength(String str) {
         int valueLength = 0;
-        String chinese = "[\u0391-\uFFE5]";
+        String chinese = "[\u4E00-\u9FA5]";
         if (!isEmpty(str)) {
             for (int i = 0; i < str.length(); i++) {
                 String temp = str.substring(i, i + 1);
@@ -54,21 +54,23 @@ public class LStringUtil {
     }
 
     /**
-     * 是否是中文
+     * 是否全是中文
      * @param str 判断的字符串
      *
-     * @return boolean 是否是中文
+     * @return boolean 是否全是中文
      */
-    public static Boolean isChinese(String str) {
-        boolean isChinese = true;
-        String chinese = "[\u0391-\uFFE5]";
-        if (!isEmpty(str)) {
-            for (int i = 0; i < str.length(); i++) {
-                String temp = str.substring(i, i + 1);
-                isChinese = temp.matches(chinese);
+    public static boolean isChinese(String str) {
+        if (isEmpty(str)) {
+            return false;
+        }
+        String chinese = "[\u4E00-\u9FA5]";
+        for (int i = 0; i < str.length(); i++) {
+            String temp = str.substring(i, i + 1);
+            if (!temp.matches(chinese)) {
+                return false;
             }
         }
-        return isChinese;
+        return true;
     }
 
     /**
@@ -77,16 +79,18 @@ public class LStringUtil {
      *
      * @return boolean 是否包含中文
      */
-    public static Boolean isContainChinese(String str) {
-        boolean isChinese = false;
-        String chinese = "[\u0391-\uFFE5]";
-        if (!isEmpty(str)) {
-            for (int i = 0; i < str.length(); i++) {
-                String temp = str.substring(i, i + 1);
-                isChinese = temp.matches(chinese);
+    public static boolean isContainChinese(String str) {
+        if (isEmpty(str)) {
+            return false;
+        }
+        String chinese = "[\u4E00-\u9FA5]";
+        for (int i = 0; i < str.length(); i++) {
+            String temp = str.substring(i, i + 1);
+            if (temp.matches(chinese)) {
+                return true;
             }
         }
-        return isChinese;
+        return false;
     }
 
     /**
@@ -130,6 +134,8 @@ public class LStringUtil {
     public static byte[] toByteArray(String hexString) {
         if (hexString == null)
             throw new IllegalArgumentException("this hexString must not be empty");
+        if (hexString.length() % 2 != 0)
+            throw new IllegalArgumentException("hexString length must be even");
 
         hexString = hexString.toUpperCase();
         final byte[] byteArray = new byte[hexString.length() / 2];
@@ -225,7 +231,11 @@ public class LStringUtil {
         if (isEmpty(str)) {
             return str;
         }
-        return str.replaceAll("([A-Z])", "_$1").toLowerCase();
+        String result = str.replaceAll("([A-Z])", "_$1").toLowerCase();
+        if (result.startsWith("_")) {
+            result = result.substring(1);
+        }
+        return result;
     }
 
     /**
@@ -305,6 +315,188 @@ public class LStringUtil {
             return str;
         }
         return new StringBuilder(str).reverse().toString();
+    }
+
+    /**
+     * 安全的equals比较（防止NPE）
+     * @param s1 字符串1
+     * @param s2 字符串2
+     * @return 是否相等
+     */
+    public static boolean equals(String s1, String s2) {
+        if (s1 == s2) return true;
+        if (s1 == null || s2 == null) return false;
+        return s1.equals(s2);
+    }
+
+    /**
+     * 安全的equalsIgnoreCase比较
+     * @param s1 字符串1
+     * @param s2 字符串2
+     * @return 是否相等（忽略大小写）
+     */
+    public static boolean equalsIgnoreCase(String s1, String s2) {
+        if (s1 == s2) return true;
+        if (s1 == null || s2 == null) return false;
+        return s1.equalsIgnoreCase(s2);
+    }
+
+    /**
+     * 如果为空则返回默认值
+     * @param str 字符串
+     * @param defaultValue 默认值
+     * @return 非空字符串
+     */
+    public static String defaultIfEmpty(String str, String defaultValue) {
+        return isEmpty(str) ? defaultValue : str;
+    }
+
+    /**
+     * 拼接字符串数组
+     * @param separator 分隔符
+     * @param parts 字符串数组
+     * @return 拼接后的字符串
+     */
+    public static String join(String separator, String... parts) {
+        if (parts == null || parts.length == 0) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            if (i > 0) sb.append(separator);
+            sb.append(parts[i] != null ? parts[i] : "");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 拼接集合
+     * @param separator 分隔符
+     * @param list 字符串集合
+     * @return 拼接后的字符串
+     */
+    public static String join(String separator, java.util.List<String> list) {
+        if (list == null || list.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) sb.append(separator);
+            String item = list.get(i);
+            sb.append(item != null ? item : "");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 重复字符串
+     * @param str 需要重复的字符串
+     * @param count 重复次数
+     * @return 重复后的字符串
+     */
+    public static String repeat(String str, int count) {
+        if (isEmpty(str) || count <= 0) return "";
+        StringBuilder sb = new StringBuilder(str.length() * count);
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 截断字符串，超过最大长度时末尾添加"..."
+     * @param str 原字符串
+     * @param maxLength 最大长度（包含"..."）
+     * @return 截断后的字符串
+     */
+    public static String abbreviate(String str, int maxLength) {
+        if (isEmpty(str) || str.length() <= maxLength) return str;
+        if (maxLength <= 3) return str.substring(0, maxLength);
+        return str.substring(0, maxLength - 3) + "...";
+    }
+
+    /**
+     * 忽略大小写判断是否包含
+     * @param str 源字符串
+     * @param search 搜索字符串
+     * @return 是否包含
+     */
+    public static boolean containsIgnoreCase(String str, String search) {
+        if (str == null || search == null) return false;
+        return str.toLowerCase().contains(search.toLowerCase());
+    }
+
+    /**
+     * 安全的substring（不会越界）
+     * @param str 原字符串
+     * @param start 开始索引
+     * @param end 结束索引
+     * @return 子字符串
+     */
+    public static String safeSubstring(String str, int start, int end) {
+        if (isEmpty(str)) return str;
+        if (start < 0) start = 0;
+        if (end > str.length()) end = str.length();
+        if (start >= end) return "";
+        return str.substring(start, end);
+    }
+
+    /**
+     * 安全的trim（防止NPE）
+     * @param str 字符串
+     * @return trim后的字符串
+     */
+    public static String safeTrim(String str) {
+        return str == null ? null : str.trim();
+    }
+
+    /**
+     * 统计子字符串出现的次数
+     * @param str 源字符串
+     * @param sub 子字符串
+     * @return 出现次数
+     */
+    public static int countMatches(String str, String sub) {
+        if (isEmpty(str) || isEmpty(sub)) return 0;
+        int count = 0;
+        int index = 0;
+        while ((index = str.indexOf(sub, index)) != -1) {
+            count++;
+            index += sub.length();
+        }
+        return count;
+    }
+
+    /**
+     * 字符串左填充
+     * @param str 原字符串
+     * @param size 目标长度
+     * @param padChar 填充字符
+     * @return 填充后的字符串
+     */
+    public static String padLeft(String str, int size, char padChar) {
+        if (str == null) str = "";
+        if (str.length() >= size) return str;
+        StringBuilder sb = new StringBuilder(size);
+        for (int i = str.length(); i < size; i++) {
+            sb.append(padChar);
+        }
+        sb.append(str);
+        return sb.toString();
+    }
+
+    /**
+     * 字符串右填充
+     * @param str 原字符串
+     * @param size 目标长度
+     * @param padChar 填充字符
+     * @return 填充后的字符串
+     */
+    public static String padRight(String str, int size, char padChar) {
+        if (str == null) str = "";
+        if (str.length() >= size) return str;
+        StringBuilder sb = new StringBuilder(size);
+        sb.append(str);
+        for (int i = str.length(); i < size; i++) {
+            sb.append(padChar);
+        }
+        return sb.toString();
     }
 
 }

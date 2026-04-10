@@ -35,11 +35,15 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * 异常日志 存储位置为根目录下的 Crash文件夹
      */
     private static String PATH = null;
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);//日期格式;
+    private static final String PATH_DATE_PATTERN = "yyyy-MM-dd";
     /**
      * 文件名后缀
      */
     private static final String FILE_NAME_SUFFIX = ".trace";
+
+    private static SimpleDateFormat getDateFormat() {
+        return new SimpleDateFormat(PATH_DATE_PATTERN, Locale.getDefault());
+    }
 
     private Thread.UncaughtExceptionHandler mDefaultCrashHandler;
     private Context mContext;
@@ -69,7 +73,9 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
         mContext = context.getApplicationContext();
 
         PATH = getFilePath(context);
-        checkFilePath(PATH);
+        if (PATH != null) {
+            checkFilePath(PATH);
+        }
         return sInstance;
     }
 
@@ -101,23 +107,14 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * 将异常信息写入SD卡
      */
     private void dumpExceptionToSDCard(Throwable e) {
-        //如果SD卡不存在或无法使用，则无法将异常信息写入SD卡
-        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            if (DEBUG) {
-                return;
-            }
+        if (PATH == null) {
+            return;
         }
-        checkFilePath(PATH);//检测文件夹
+        checkFilePath(PATH);
 
-        String fileName = getFileName(new Date());//log日志名，使用时间命名，保证不重复
-
-        //得到当前年月日时分秒
-        long current = System.currentTimeMillis();
-        Date date = new Date(current);
-        String time = dateFormat.format(date);
+        Date date = new Date();
+        String time = getDateFormat().format(date);
         fileNameException = getFileName(date);
-        //在定义的Crash文件夹下创建文件
-        checkFileSize(fileName);
 
         try{
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(new File(fileNameException))));
@@ -174,15 +171,11 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
     public String getFilePath(Context context) {
         if(context == null)
             return null;
-        if (!Environment.isExternalStorageRemovable()) {//如果外部储存可用
-            File file = context.getExternalFilesDir(null);
-            if(file != null && file.exists()){
-                return file.getPath() + "/Crash/";//获得外部存储路径,默认路径为 /storage/emulated/Android/data/com.../files/Logs/log_2018-03-14.txt
-            }else
-                return null;
-        } else {
-            return context.getFilesDir().getPath() + "/Crash/";//直接存在/data/data里，非root手机是看不到的
+        File externalDir = context.getExternalFilesDir(null);
+        if (externalDir != null && externalDir.exists()) {
+            return externalDir.getPath() + "/Crash/";
         }
+        return context.getFilesDir().getPath() + "/Crash/";
     }
 
     /**
@@ -191,7 +184,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      */
     @SuppressWarnings("WeakerAccess")
     public String getFileName(Date date){
-        return PATH + "crash_" + dateFormat.format(date) + ".trace";
+        return PATH + "crash_" + getDateFormat().format(date) + ".trace";
     }
 
     /**
@@ -199,6 +192,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
      * @param pathName 路径
      */
     private void checkFilePath(String pathName){
+        if (pathName == null) return;
         File file = new File(pathName);
         if (file.exists()) {
             if (getFolderSize(file) > 100 * 1024 * 1024) {
@@ -234,6 +228,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
         long size = 0;
         try {
             File[] fileList = file.listFiles();
+            if (fileList == null) return 0;
             for(File fileSingle: fileList){
                 if(fileSingle.isDirectory()){
                     size +=  getFolderSize(fileSingle);
@@ -255,6 +250,7 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
     public boolean deleteFolder(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
+            if (files == null) return true;
             boolean deleteAll = true;
             for(File fileSingle: files){
                 if(!deleteFolder(fileSingle)){
@@ -262,7 +258,6 @@ public class LCrashHandlerUtil implements Thread.UncaughtExceptionHandler {
                 }
             }
             return deleteAll;
-//            file.delete();//如要保留文件夹，只删除文件，请注释这行
         } else if (file.exists()) {
             return file.delete();
         }

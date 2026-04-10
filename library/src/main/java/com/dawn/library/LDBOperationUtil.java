@@ -12,7 +12,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class LDBOperationUtil {
     public static final String DB_NAME = "lite_orm";
-    private static LiteOrm liteOrm;
+    private static volatile LiteOrm liteOrm;
 
     /**
      * 初始化
@@ -20,12 +20,9 @@ public class LDBOperationUtil {
      * @param liteName 数据库名称
      * @param debug 是否打印日志
      */
-    public static void newSingleInstance(Context mContext, String liteName, boolean debug){
+    public static synchronized void newSingleInstance(Context mContext, String liteName, boolean debug){
         if(liteOrm == null){
-//            DataBaseConfig config = new DataBaseConfig(mContext, liteName);
-//            config.dbVersion = 1; // set database version
-//            config.onUpdateListener = null; // set database update listener
-            liteOrm = LiteOrm.newSingleInstance(mContext, liteName);
+            liteOrm = LiteOrm.newSingleInstance(mContext.getApplicationContext(), liteName);
         }
         liteOrm.setDebugged(debug);
     }
@@ -149,7 +146,17 @@ public class LDBOperationUtil {
             return liteOrm.<T>query(new QueryBuilder(cla).where(where, values).orderBy(order + " desc"));
         return null;
     }
-    public static <T> List<T> queryByWhereLike(Class<T> cla){
+    /**
+     * 模糊查询
+     * @param cla 实体类的类型
+     * @param field 查询的字段
+     * @param keyword 模糊匹配的关键字
+     * @return 查询结果
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static <T> List<T> queryByWhereLike(Class<T> cla, String field, String keyword){
+        if(liteOrm != null)
+            return liteOrm.<T>query(new QueryBuilder(cla).where(field + " LIKE ?", new String[]{"%" + keyword + "%"}));
         return null;
     }
 
@@ -244,7 +251,7 @@ public class LDBOperationUtil {
      * 更新所有
      * @param list 实体类的集合
      */
-    public static <T> void updateALL(List<T> list){
+    public static <T> void updateAll(List<T> list){
         if(liteOrm != null)
             liteOrm.update(list);
     }

@@ -1,12 +1,13 @@
 package com.dawn.library;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.provider.Settings;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -46,7 +47,7 @@ public class LNetUtil {
             ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (connectivity != null) {
                 NetworkInfo info = connectivity.getActiveNetworkInfo();
-                return info.isAvailable();
+                return info != null && info.isAvailable();
             }
         } catch (Exception e) {
             return false;
@@ -62,11 +63,12 @@ public class LNetUtil {
      */
     public static boolean isWiFi(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        // wifi的状态：ConnectivityManager.TYPE_WIFI
-        // 3G的状态：ConnectivityManager.TYPE_MOBILE
         if(cm == null)
             return false;
-        return cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        if(info == null)
+            return false;
+        return info.getType() == ConnectivityManager.TYPE_WIFI;
     }
 
     /**
@@ -74,11 +76,8 @@ public class LNetUtil {
      * @param activity Activity
      */
     public static void openNetSetting(Activity activity) {
-        Intent intent = new Intent();
-        ComponentName cm = new ComponentName("com.android.settings", "com.android.settings.WirelessSettings");
-        intent.setComponent(cm);
-        intent.setAction("android.intent.action.VIEW");
-        activity.startActivityForResult(intent, 0);
+        Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+        activity.startActivity(intent);
     }
 
     /**
@@ -100,10 +99,17 @@ public class LNetUtil {
      * @param stringBuffer ping的结果
      */
     public static boolean ping(String host, int pingCount, StringBuffer stringBuffer) {
+        // 防止命令注入：只允许字母、数字、点、冠号和连字符
+        if (host == null || !host.matches("^[a-zA-Z0-9.:\\-]+$")) {
+            append(stringBuffer, "ping fail: invalid host.");
+            return false;
+        }
+        if (pingCount <= 0 || pingCount > 10) {
+            pingCount = 1;
+        }
         String line;
         Process process = null;
         BufferedReader successReader = null;
-        // String command = "ping -c " + pingCount + " -w 5 " + host;
         String command = "ping -c " + pingCount + " " + host;
         boolean isSuccess = false;
         try {
@@ -197,7 +203,11 @@ public class LNetUtil {
         if (wifiManager == null) {
             return 0;
         }
-        return wifiManager.getConnectionInfo().getRssi();
+        android.net.wifi.WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo == null) {
+            return 0;
+        }
+        return wifiInfo.getRssi();
     }
 
     /**
@@ -210,7 +220,11 @@ public class LNetUtil {
         if (wifiManager == null) {
             return "";
         }
-        String ssid = wifiManager.getConnectionInfo().getSSID();
+        android.net.wifi.WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo == null) {
+            return "";
+        }
+        String ssid = wifiInfo.getSSID();
         if (ssid != null && ssid.startsWith("\"") && ssid.endsWith("\"")) {
             ssid = ssid.substring(1, ssid.length() - 1);
         }
@@ -266,6 +280,73 @@ public class LNetUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * 获取本机MAC地址
+     * @return MAC地址
+     */
+    public static String getMacAddress() {
+        try {
+            java.util.Enumeration<java.net.NetworkInterface> interfaces =
+                    java.net.NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                java.net.NetworkInterface networkInterface = interfaces.nextElement();
+                byte[] mac = networkInterface.getHardwareAddress();
+                if (mac == null || mac.length == 0) continue;
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < mac.length; i++) {
+                    sb.append(String.format("%02X", mac[i]));
+                    if (i < mac.length - 1) sb.append(":");
+                }
+                String macStr = sb.toString();
+                // 跳过全0的地址
+                if (!"00:00:00:00:00:00".equals(macStr)) {
+                    return macStr;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * URL编码
+     * @param url 原始URL
+     * @return 编码后的URL
+     */
+    public static String encodeUrl(String url) {
+        try {
+            return java.net.URLEncoder.encode(url, "UTF-8");
+        } catch (Exception e) {
+            return url;
+        }
+    }
+
+    /**
+     * URL解码
+     * @param url 编码后的URL
+     * @return 解码后的URL
+     */
+    public static String decodeUrl(String url) {
+        try {
+            return java.net.URLDecoder.decode(url, "UTF-8");
+        } catch (Exception e) {
+            return url;
+        }
+    }
+
+    /**
+     * 判断当前网络是否为以太网
+     * @param context 上下文
+     * @return 是否为以太网
+     */
+    public static boolean isEthernet(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) return false;
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_ETHERNET;
     }
 
 }

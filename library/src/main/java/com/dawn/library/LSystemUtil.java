@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,14 +42,24 @@ public class LSystemUtil {
 
     /**
      * 安装apk
+     * @param context 上下文
      * @param apkfile apk文件
+     * @param authority FileProvider的authority
      */
-    public static void installApk(Context context, File apkfile) {
-        Intent intent = new Intent();
-        intent.setAction("android.intent.action.VIEW");
-        intent.addCategory("android.intent.category.DEFAULT");
-        intent.setDataAndType(Uri.fromFile(apkfile), "application/vnd.android.package-archive");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    public static void installApk(Context context, File apkfile, String authority) {
+        if (apkfile == null || !apkfile.exists()) {
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uri = FileProvider.getUriForFile(context, authority, apkfile);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            uri = Uri.fromFile(apkfile);
+        }
+        intent.setDataAndType(uri, "application/vnd.android.package-archive");
         context.startActivity(intent);
     }
 
@@ -67,6 +80,8 @@ public class LSystemUtil {
     public static void hideSoftInput(Context context) {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         if(inputMethodManager == null)
+            return;
+        if (!(context instanceof Activity))
             return;
         View view = ((Activity) context).getCurrentFocus();
         if(view == null)
@@ -197,8 +212,12 @@ public class LSystemUtil {
     public static String getFromClipboard(Context context) {
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard != null && clipboard.hasPrimaryClip()) {
-            android.content.ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
-            return item.getText().toString();
+            android.content.ClipData clipData = clipboard.getPrimaryClip();
+            if (clipData != null && clipData.getItemCount() > 0) {
+                android.content.ClipData.Item item = clipData.getItemAt(0);
+                CharSequence text = item.getText();
+                return text != null ? text.toString() : "";
+            }
         }
         return "";
     }
@@ -225,5 +244,137 @@ public class LSystemUtil {
         intent.setData(Uri.parse("smsto:" + phoneNumber));
         intent.putExtra("sms_body", message);
         context.startActivity(intent);
+    }
+
+    /**
+     * 打开浏览器
+     * @param context 上下文
+     * @param url 网址
+     */
+    public static void openBrowser(Context context, String url) {
+        if (url == null || url.isEmpty()) return;
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url;
+        }
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 发送邮件
+     * @param context 上下文
+     * @param email 收件人邮箱
+     * @param subject 主题
+     * @param body 内容
+     */
+    public static void sendEmail(Context context, String email, String subject, String body) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:" + email));
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, body);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 分享文字
+     * @param context 上下文
+     * @param text 分享的文本
+     * @param title 分享对话框标题
+     */
+    public static void shareText(Context context, String text, String title) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(Intent.createChooser(intent, title));
+    }
+
+    /**
+     * 分享图片
+     * @param context 上下文
+     * @param imageUri 图片Uri
+     * @param title 分享对话框标题
+     */
+    public static void shareImage(Context context, Uri imageUri, String title) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(Intent.createChooser(intent, title));
+    }
+
+    /**
+     * 判断是否为平板设备
+     * @param context 上下文
+     * @return 是否为平板
+     */
+    public static boolean isTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & android.content.res.Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= android.content.res.Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    /**
+     * 判断是否为横屏
+     * @param context 上下文
+     * @return 是否为横屏
+     */
+    public static boolean isLandscape(Context context) {
+        return context.getResources().getConfiguration().orientation
+                == android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    /**
+     * 判断是否为竖屏
+     * @param context 上下文
+     * @return 是否为竖屏
+     */
+    public static boolean isPortrait(Context context) {
+        return context.getResources().getConfiguration().orientation
+                == android.content.res.Configuration.ORIENTATION_PORTRAIT;
+    }
+
+    /**
+     * 打开系统WiFi设置页面
+     * @param context 上下文
+     */
+    public static void openWifiSettings(Context context) {
+        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 打开系统蓝牙设置页面
+     * @param context 上下文
+     */
+    public static void openBluetoothSettings(Context context) {
+        Intent intent = new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 打开系统显示设置页面
+     * @param context 上下文
+     */
+    public static void openDisplaySettings(Context context) {
+        Intent intent = new Intent(Settings.ACTION_DISPLAY_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 获取应用可用的最大堆内存（MB）
+     * @param context 上下文
+     * @return 最大堆内存（MB）
+     */
+    public static int getMaxHeapMemory(Context context) {
+        android.app.ActivityManager am = (android.app.ActivityManager)
+                context.getSystemService(Context.ACTIVITY_SERVICE);
+        return am != null ? am.getMemoryClass() : 0;
     }
 }

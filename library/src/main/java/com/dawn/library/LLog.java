@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -57,8 +56,16 @@ public class LLog {
 
     private static String logPath = null;//log日志存放路径
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);//日期格式;
-    private static final SimpleDateFormat dateFormat_log = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US);//日期格式;
+    private static final String PATTERN_DATE = "yyyy-MM-dd";
+    private static final String PATTERN_DATE_LOG = "yyyy-MM-dd_HH-mm-ss";
+
+    private static SimpleDateFormat getDateFormat() {
+        return new SimpleDateFormat(PATTERN_DATE, Locale.getDefault());
+    }
+
+    private static SimpleDateFormat getDateLogFormat() {
+        return new SimpleDateFormat(PATTERN_DATE_LOG, Locale.getDefault());
+    }
 
     /**
      * 初始化日志开关和TAG（默认之日为开，TAG为‘tag’）
@@ -180,7 +187,12 @@ public class LLog {
      * @param tr 报错
      */
     public static void e(String msg, Throwable tr) {
-        String errorStr = msg + "\n" + tr.getMessage() + "\n" + getThrowableStr(tr);
+        String errorStr;
+        if (tr != null) {
+            errorStr = msg + "\n" + tr.getMessage() + "\n" + getThrowableStr(tr);
+        } else {
+            errorStr = msg;
+        }
         log(ERROR, TAG, errorStr);
         writeToFile(CHAR_ERROR, TAG, errorStr);
     }
@@ -192,7 +204,12 @@ public class LLog {
      * @param tr 报错
      */
     public static void e(String tag, String msg, Throwable tr) {
-        String errorStr = msg + "\n" + tr.getMessage() + "\n" + getThrowableStr(tr);
+        String errorStr;
+        if (tr != null) {
+            errorStr = msg + "\n" + tr.getMessage() + "\n" + getThrowableStr(tr);
+        } else {
+            errorStr = msg;
+        }
         log(ERROR, tag, errorStr);
         writeToFile(CHAR_ERROR, tag, errorStr);
     }
@@ -301,7 +318,10 @@ public class LLog {
                 printSub(type, tag, sub);
                 index += maxLength;
             }
-            //printSub(type, msg.substring(index, msg.length()));
+            // Print remaining part
+            if (index < msg.length()) {
+                printSub(type, tag, msg.substring(index));
+            }
         } else {
             printSub(type, tag, msg);
         }
@@ -504,10 +524,12 @@ public class LLog {
 //            return context.getFilesDir().getPath() + "/Logs/";//直接存在/data/data里，非root手机是看不到的
 //        }
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            return Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath() + "/Logs/";
-        } else {
-            return context.getFilesDir().getAbsolutePath() + "/Logs/";
+            File externalDir = context.getExternalFilesDir(null);
+            if (externalDir != null) {
+                return externalDir.getAbsolutePath() + "/Logs/";
+            }
         }
+        return context.getFilesDir().getAbsolutePath() + "/Logs/";
     }
 
     /**
@@ -552,6 +574,7 @@ public class LLog {
         long size = 0;
         try {
             File[] fileList = file.listFiles();
+            if (fileList == null) return 0;
             for(File fileSingle: fileList){
                 if(fileSingle.isDirectory())
                     size += getFolderSize(fileSingle);
@@ -572,9 +595,10 @@ public class LLog {
     public static void deleteFolder(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
-            for(File fileSingle: files)
-                deleteFolder(fileSingle);
-//            file.delete();//如要保留文件夹，只删除文件，请注释这行
+            if (files != null) {
+                for (File fileSingle : files)
+                    deleteFolder(fileSingle);
+            }
         } else if (file.exists()) {
             file.delete();
         }
@@ -596,16 +620,14 @@ public class LLog {
         String tag = contents[0];
         String msg = contents[1];
         String headString = contents[2];
-        String fileName = getFileName(new Date());//log日志名，使用时间命名，保证不重复
-//        String log = dateFormat_log.format(new Date()) + " " + type + " " + tag + " " + msg + "\n";//log日志内容，可以自行定制
-        String log = dateFormat_log.format(new Date()) + " " + headString + " " + msg + "\n";
-        checkFilePath(logPath);//检测文件夹，查看是否存在，是否占用内存过多
+        String fileName = getFileName(new Date());
+        String log = getDateLogFormat().format(new Date()) + " " + headString + " " + msg + "\n";
+        checkFilePath(logPath);
 
-        FileOutputStream fos;//FileOutputStream会自动调用底层的close()方法，不用关闭
         BufferedWriter bw = null;
         try {
             checkFileSize(fileName);//检测文件，查看是否存在，是否占用内存过多
-            fos = new FileOutputStream(fileName, true);//这里的第二个参数代表追加还是覆盖，true为追加，flase为覆盖
+            FileOutputStream fos = new FileOutputStream(fileName, true);//追加模式
             bw = new BufferedWriter(new OutputStreamWriter(fos));
             bw.write(log);
         } catch (FileNotFoundException e) {
@@ -636,7 +658,7 @@ public class LLog {
      */
     @SuppressWarnings("WeakerAccess")
     public static String getFileName(Date date){
-        return logPath + "log_" + dateFormat.format(date) + ".txt";
+        return logPath + "log_" + getDateFormat().format(date) + ".txt";
     }
 
     /**

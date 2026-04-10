@@ -12,8 +12,10 @@ import java.security.DigestInputStream;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -59,8 +61,9 @@ public class LCipherUtil {
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             digestInputStream = new DigestInputStream(in, messageDigest);
             byte[] buffer = new byte[bufferSize];
-            if (digestInputStream.read(buffer) > 0)
-                return null;
+            while (digestInputStream.read(buffer) > 0) {
+                // 持续读取以计算完整的MD5
+            }
             messageDigest = digestInputStream.getMessageDigest();
             byte[] resultByteArray = messageDigest.digest();
             char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
@@ -167,9 +170,11 @@ public class LCipherUtil {
      *
      * @return 异或加密后的字符串
      */
-    public static String XorEncode(String str, String privateKey) {
+    public static String xorEncode(String str, String privateKey) {
+        if (str == null || privateKey == null || privateKey.isEmpty()) {
+            return str;
+        }
         int[] snNum = new int[str.length()];
-        String temp = "";
         for (int i = 0, j = 0; i < str.length(); i++, j++) {
             if (j == privateKey.length())
                 j = 0;
@@ -178,13 +183,12 @@ public class LCipherUtil {
         StringBuilder sb = new StringBuilder();
         for (int k = 0; k < str.length(); k++) {
             if (snNum[k] < 10) {
-                temp = "00" + snNum[k];
+                sb.append("00").append(snNum[k]);
+            } else if (snNum[k] < 100) {
+                sb.append("0").append(snNum[k]);
             } else {
-                if (snNum[k] < 100) {
-                    temp = "0" + snNum[k];
-                }
+                sb.append(snNum[k]);
             }
-            sb.append(temp);
         }
         return sb.toString();
     }
@@ -196,7 +200,10 @@ public class LCipherUtil {
      *
      * @return 异或解密后的字符串
      */
-    public static String XorDecode(String str, String privateKey) {
+    public static String xorDecode(String str, String privateKey) {
+        if (str == null || privateKey == null || privateKey.isEmpty() || str.length() % 3 != 0) {
+            return str;
+        }
         char[] snNum = new char[str.length() / 3];
 
         for (int i = 0, j = 0; i < str.length() / 3; i++, j++) {
@@ -246,12 +253,19 @@ public class LCipherUtil {
     @SuppressLint("GetInstance")
     private static byte[] encryptAES(byte[] source, byte rawKeyData[])
             throws GeneralSecurityException {
-        // 处理密钥
         SecretKeySpec key = new SecretKeySpec(rawKeyData, "AES");
-        // 加密
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        return cipher.doFinal(source);
+        // 生成随机IV
+        byte[] iv = new byte[16];
+        new SecureRandom().nextBytes(iv);
+        IvParameterSpec ivSpec = new IvParameterSpec(iv);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
+        byte[] encrypted = cipher.doFinal(source);
+        // IV + 密文拼接
+        byte[] result = new byte[iv.length + encrypted.length];
+        System.arraycopy(iv, 0, result, 0, iv.length);
+        System.arraycopy(encrypted, 0, result, iv.length, encrypted.length);
+        return result;
     }
 
     /**
@@ -264,12 +278,16 @@ public class LCipherUtil {
     @SuppressLint("GetInstance")
     private static byte[] decryptAES(byte[] data, byte rawKeyData[])
             throws GeneralSecurityException {
-        // 处理密钥
         SecretKeySpec key = new SecretKeySpec(rawKeyData, "AES");
-        // 解密
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        return cipher.doFinal(data);
+        // 从数据中提取IV
+        byte[] iv = new byte[16];
+        System.arraycopy(data, 0, iv, 0, iv.length);
+        IvParameterSpec ivSpec = new IvParameterSpec(iv);
+        byte[] encrypted = new byte[data.length - iv.length];
+        System.arraycopy(data, iv.length, encrypted, 0, encrypted.length);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+        return cipher.doFinal(encrypted);
     }
 
     /**
@@ -337,8 +355,11 @@ public class LCipherUtil {
      * @return 随机字符串
      */
     public static String generateRandomString(int length) {
+        if (length <= 0) {
+            return "";
+        }
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        java.util.Random random = new java.util.Random();
+        SecureRandom random = new SecureRandom();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
             sb.append(chars.charAt(random.nextInt(chars.length())));
