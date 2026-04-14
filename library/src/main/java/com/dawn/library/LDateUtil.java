@@ -353,4 +353,201 @@ public class LDateUtil {
         return calendar.getTimeInMillis();
     }
 
+    /**
+     * 获取星期几的中文名称（简写）
+     * @param timestamp 时间戳
+     * @return 星期几中文名称（如：周一）
+     */
+    public static String getDayOfWeekChinese(long timestamp) {
+        String[] weekDays = {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
+        int dayOfWeek = getDayOfWeek(timestamp);
+        return weekDays[dayOfWeek - 1];
+    }
+
+    /**
+     * 获取年份
+     * @param timestamp 时间戳
+     * @return 年份
+     */
+    public static int getYear(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        return calendar.get(Calendar.YEAR);
+    }
+
+    /**
+     * 获取月份（1-12）
+     * @param timestamp 时间戳
+     * @return 月份
+     */
+    public static int getMonth(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        return calendar.get(Calendar.MONTH) + 1;
+    }
+
+    /**
+     * 获取日期（1-31）
+     * @param timestamp 时间戳
+     * @return 日期
+     */
+    public static int getDay(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        return calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * 获取小时（0-23）
+     * @param timestamp 时间戳
+     * @return 小时
+     */
+    public static int getHour(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        return calendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    /**
+     * 获取分钟（0-59）
+     * @param timestamp 时间戳
+     * @return 分钟
+     */
+    public static int getMinute(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        return calendar.get(Calendar.MINUTE);
+    }
+
+    /**
+     * 获取秒（0-59）
+     * @param timestamp 时间戳
+     * @return 秒
+     */
+    public static int getSecond(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        return calendar.get(Calendar.SECOND);
+    }
+
+    /**
+     * 获取今天开始时间戳（00:00:00）
+     * @return 今天开始时间戳
+     */
+    public static long getTodayStart() {
+        return getStartOfDay(System.currentTimeMillis());
+    }
+
+    /**
+     * 获取今天结束时间戳（23:59:59）
+     * @return 今天结束时间戳
+     */
+    public static long getTodayEnd() {
+        return getEndOfDay(System.currentTimeMillis());
+    }
+
+    /**
+     * 判断是否为昨天
+     * @param timestamp 时间戳
+     * @return 是否为昨天
+     */
+    public static boolean isYesterday(long timestamp) {
+        long yesterday = addDays(System.currentTimeMillis(), -1);
+        return longToDate(yesterday).equals(longToDate(timestamp));
+    }
+
+    /**
+     * 判断是否为同一天
+     * @param timestamp1 时间戳1
+     * @param timestamp2 时间戳2
+     * @return 是否为同一天
+     */
+    public static boolean isSameDay(long timestamp1, long timestamp2) {
+        return longToDate(timestamp1).equals(longToDate(timestamp2));
+    }
+
+    /**
+     * 格式化时间差（如：3分钟前、2小时前、昨天等）
+     * @param timestamp 时间戳
+     * @return 格式化后的字符串
+     */
+    public static String formatTimeAgo(long timestamp) {
+        long now = System.currentTimeMillis();
+        long diff = now - timestamp;
+
+        if (diff < 60 * 1000) {
+            return "刚刚";
+        } else if (diff < 60 * 60 * 1000) {
+            return (diff / (60 * 1000)) + "分钟前";
+        } else if (diff < 24 * 60 * 60 * 1000) {
+            return (diff / (60 * 60 * 1000)) + "小时前";
+        } else if (diff < 2 * 24 * 60 * 60 * 1000) {
+            return "昨天";
+        } else if (diff < 7 * 24 * 60 * 60 * 1000) {
+            return (diff / (24 * 60 * 60 * 1000)) + "天前";
+        } else {
+            return longToDate(timestamp);
+        }
+    }
+
+    /**
+     * 格式化时长（简短格式，如：1小时30分）
+     * @param millis 毫秒数
+     * @return 格式化后的时长字符串
+     */
+    public static String formatDurationShort(long millis) {
+        long seconds = millis / 1000;
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+
+        if (hours > 0) {
+            return hours + "小时" + (minutes > 0 ? minutes + "分" : "");
+        } else if (minutes > 0) {
+            return minutes + "分钟";
+        } else {
+            return seconds + "秒";
+        }
+    }
+
+    /**
+     * 格式化时长（HH:mm:ss格式）
+     * @param millis 毫秒数
+     * @return 格式化后的时长字符串
+     */
+    public static String formatDurationHMS(long millis) {
+        long seconds = millis / 1000;
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+        return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, secs);
+    }
+
+    /**
+     * 获取当月第一天时间戳
+     * @return 当月第一天开始时间戳
+     */
+    public static long getMonthStart() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+
+    /**
+     * 获取当月最后一天时间戳
+     * @return 当月最后一天结束时间戳
+     */
+    public static long getMonthEnd() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        return calendar.getTimeInMillis();
+    }
+
 }

@@ -47,6 +47,7 @@ public class LFileUtil {
      * @return 是否删除成功
      */
     public static boolean deleteFile(String filename) {
+        if (filename == null || filename.isEmpty()) return false;
         return new File(filename).delete();
     }
 
@@ -112,6 +113,7 @@ public class LFileUtil {
      * @return 是否存在
      */
     public static boolean isFileExist(String filePath) {
+        if (filePath == null || filePath.isEmpty()) return false;
         return new File(filePath).exists();
     }
 
@@ -429,6 +431,7 @@ public class LFileUtil {
      * @return 文件内容
      */
     public static String readFileAll(String filePath) {
+        if (LStringUtil.isEmpty(filePath)) return null;
         File file = new File(filePath);
         if (!file.exists()) {
             return null;
@@ -590,6 +593,7 @@ public class LFileUtil {
      * @return 字节数组
      */
     public static byte[] readFileToBytes(String filePath) {
+        if (LStringUtil.isEmpty(filePath)) return null;
         File file = new File(filePath);
         if (!file.exists()) return null;
         return fileToByteAry(file);

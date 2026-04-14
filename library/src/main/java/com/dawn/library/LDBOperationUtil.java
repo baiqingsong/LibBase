@@ -21,6 +21,7 @@ public class LDBOperationUtil {
      * @param debug 是否打印日志
      */
     public static synchronized void newSingleInstance(Context mContext, String liteName, boolean debug){
+        if(mContext == null || liteName == null || liteName.isEmpty()) return;
         if(liteOrm == null){
             liteOrm = LiteOrm.newSingleInstance(mContext.getApplicationContext(), liteName);
         }

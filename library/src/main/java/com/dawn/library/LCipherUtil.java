@@ -32,7 +32,7 @@ public class LCipherUtil {
     public static String encryptMD5(String input) {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            messageDigest.update(input.getBytes());
+            messageDigest.update(input.getBytes("UTF-8"));
             byte[] resultByteArray = messageDigest.digest();
             char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
             char[] resultCharArray = new char[resultByteArray.length * 2];
@@ -42,7 +42,7 @@ public class LCipherUtil {
                 resultCharArray[index++] = hexDigits[b & 0xf];
             }
             return new String(resultCharArray);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return null;
@@ -96,7 +96,11 @@ public class LCipherUtil {
      * @return base64加密后的字符串
      */
     public static String base64Encode(String str) {
-        return Base64.encodeToString(str.getBytes(), Base64.DEFAULT);
+        try {
+            return Base64.encodeToString(str.getBytes("UTF-8"), Base64.DEFAULT);
+        } catch (UnsupportedEncodingException e) {
+            return Base64.encodeToString(str.getBytes(), Base64.DEFAULT);
+        }
     }
 
     /**
@@ -106,7 +110,11 @@ public class LCipherUtil {
      * @return base64解密后的字符串
      */
     public static String base64Decode(String str) {
-        return new String(Base64.decode(str.getBytes(), Base64.DEFAULT));
+        try {
+            return new String(Base64.decode(str.getBytes("UTF-8"), Base64.DEFAULT), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return new String(Base64.decode(str.getBytes(), Base64.DEFAULT));
+        }
     }
 
     /**
@@ -118,7 +126,7 @@ public class LCipherUtil {
     public static String encryptSHA1(String str) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
-            digest.update(str.getBytes());
+            digest.update(str.getBytes("UTF-8"));
             byte messageDigest[] = digest.digest();
             StringBuilder hexString = new StringBuilder();
             for (byte aMessageDigest : messageDigest) {
@@ -130,7 +138,7 @@ public class LCipherUtil {
             }
             return hexString.toString();
 
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return null;
@@ -147,7 +155,7 @@ public class LCipherUtil {
         try {
             in = new FileInputStream(file);
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-            byte[] b = new byte[1024 * 1024 * 10];//10M memory
+            byte[] b = new byte[8192];
             int len;
             while ((len = in.read(b)) > 0) {
                 messageDigest.update(b, 0, len);

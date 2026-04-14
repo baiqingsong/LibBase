@@ -266,6 +266,193 @@ public class LBitmapUtil {
     }
 
     /**
+     * Bitmap转Base64字符串（JPEG格式，质量100）
+     * @param bitmap 图片
+     * @return Base64字符串
+     */
+    public static String bitmapToBase64(Bitmap bitmap) {
+        return bitmapToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
+    }
+
+    /**
+     * Bitmap转Base64字符串（JPEG格式，指定质量）
+     * @param bitmap 图片
+     * @param quality 质量（0-100）
+     * @return Base64字符串
+     */
+    public static String bitmapToBase64(Bitmap bitmap, int quality) {
+        return bitmapToBase64(bitmap, Bitmap.CompressFormat.JPEG, quality);
+    }
+
+    /**
+     * Bitmap转byte数组（JPEG格式）
+     * @param bitmap 图片
+     * @param quality 质量（0-100）
+     * @return byte数组
+     */
+    public static byte[] bitmapToByteArray(Bitmap bitmap, int quality) {
+        return bitmapToBytes(bitmap, Bitmap.CompressFormat.JPEG, quality);
+    }
+
+    /**
+     * byte数组转Bitmap
+     * @param bytes byte数组
+     * @return Bitmap
+     */
+    public static Bitmap byteArrayToBitmap(byte[] bytes) {
+        return bytesToBitmap(bytes);
+    }
+
+    /**
+     * 保存Bitmap到文件路径
+     * @param bitmap 图片
+     * @param filePath 文件路径
+     * @param quality 压缩质量（0-100）
+     * @return 是否保存成功
+     */
+    public static boolean saveBitmap(Bitmap bitmap, String filePath, int quality) {
+        if (bitmap == null || filePath == null || filePath.isEmpty()) return false;
+        Bitmap.CompressFormat format = filePath.toLowerCase().endsWith(".png")
+                ? Bitmap.CompressFormat.PNG
+                : Bitmap.CompressFormat.JPEG;
+        return saveBitmap(bitmap, new File(filePath), format, quality);
+    }
+
+    /**
+     * 保存Bitmap到文件路径（默认质量90）
+     * @param bitmap 图片
+     * @param filePath 文件路径
+     * @return 是否保存成功
+     */
+    public static boolean saveBitmap(Bitmap bitmap, String filePath) {
+        return saveBitmap(bitmap, filePath, 90);
+    }
+
+    /**
+     * 从文件加载Bitmap
+     * @param filePath 文件路径
+     * @return Bitmap
+     */
+    public static Bitmap loadBitmap(String filePath) {
+        if (filePath == null || filePath.isEmpty()) return null;
+        return BitmapFactory.decodeFile(filePath);
+    }
+
+    /**
+     * 从文件加载Bitmap（指定尺寸采样，避免OOM）
+     * @param filePath 文件路径
+     * @param reqWidth 目标宽度
+     * @param reqHeight 目标高度
+     * @return Bitmap
+     */
+    public static Bitmap loadBitmap(String filePath, int reqWidth, int reqHeight) {
+        return decodeSampledBitmap(filePath, reqWidth, reqHeight);
+    }
+
+    /**
+     * 裁剪人脸区域
+     * @param source 源图片
+     * @param w 宽度
+     * @param h 高度
+     * @param w2 目标宽度
+     * @param h2 目标高度
+     * @return 裁剪后的图片
+     */
+    public static Bitmap cropFace(Bitmap source, int w, int h, int w2, int h2) {
+        if (source == null) return null;
+        int dw = source.getWidth();
+        float scale = 1280f / dw;
+        int nw = (int) (w / scale);
+        int nh = (int) (h / scale);
+        int x = (int) ((dw - nw) / 2f);
+        Bitmap bitmapNew = Bitmap.createBitmap(source, x, 0, nw, nh, null, false);
+        return cropping(bitmapNew, w2, h2);
+    }
+
+    /**
+     * 裁剪位图到指定宽高比，保持居中裁剪
+     * @param source 源位图
+     * @param targetWidth 目标宽高比中的宽度
+     * @param targetHeight 目标宽高比中的高度
+     * @return 裁剪后的位图
+     */
+    public static Bitmap cropping(Bitmap source, int targetWidth, int targetHeight) {
+        return cropping(source, targetWidth, targetHeight, source != null ? source.getWidth() : 0);
+    }
+
+    /**
+     * 裁剪位图到指定宽高比，保持居中裁剪
+     * @param source 源位图
+     * @param targetWidth 目标宽高比中的宽度
+     * @param targetHeight 目标宽高比中的高度
+     * @param maxWidth 最大允许宽度
+     * @return 裁剪后的位图
+     */
+    public static Bitmap cropping(Bitmap source, int targetWidth, int targetHeight, int maxWidth) {
+        if (source == null) return null;
+        final int srcWidth = source.getWidth();
+        final int srcHeight = source.getHeight();
+        final double targetRatio = (double) targetWidth / targetHeight;
+        int cropHeight = srcHeight;
+        double cropWidth = cropHeight * targetRatio;
+        if (cropWidth > maxWidth) {
+            cropWidth = maxWidth;
+            cropHeight = (int) (cropWidth / targetRatio);
+        }
+        if (cropWidth > srcWidth) {
+            cropWidth = srcWidth;
+            cropHeight = (int) (cropWidth / targetRatio);
+        }
+        if (cropHeight > srcHeight) return source;
+        int x = Math.max(0, (srcWidth - (int) cropWidth) / 2);
+        int y = Math.max(0, (srcHeight - cropHeight) / 2);
+        int finalWidth = Math.min((int) cropWidth, srcWidth - x);
+        int finalHeight = Math.min(cropHeight, srcHeight - y);
+        if (finalWidth <= 0 || finalHeight <= 0) return source;
+        try {
+            return Bitmap.createBitmap(source, x, y, finalWidth, finalHeight);
+        } catch (IllegalArgumentException e) {
+            return source;
+        }
+    }
+
+    /**
+     * 合并两张图片（水平拼接）
+     * @param left 左图
+     * @param right 右图
+     * @return 合并后的图片
+     */
+    public static Bitmap mergeHorizontal(Bitmap left, Bitmap right) {
+        if (left == null) return right;
+        if (right == null) return left;
+        int width = left.getWidth() + right.getWidth();
+        int height = Math.max(left.getHeight(), right.getHeight());
+        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(left, 0, 0, null);
+        canvas.drawBitmap(right, left.getWidth(), 0, null);
+        return result;
+    }
+
+    /**
+     * 合并两张图片（垂直拼接）
+     * @param top 上图
+     * @param bottom 下图
+     * @return 合并后的图片
+     */
+    public static Bitmap mergeVertical(Bitmap top, Bitmap bottom) {
+        if (top == null) return bottom;
+        if (bottom == null) return top;
+        int width = Math.max(top.getWidth(), bottom.getWidth());
+        int height = top.getHeight() + bottom.getHeight();
+        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(top, 0, 0, null);
+        canvas.drawBitmap(bottom, 0, top.getHeight(), null);
+        return result;
+    }
+
+    /**
      * 安全回收Bitmap
      * @param bitmap 需要回收的Bitmap
      */

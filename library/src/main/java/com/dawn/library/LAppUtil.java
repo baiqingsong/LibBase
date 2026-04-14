@@ -334,4 +334,41 @@ public class LAppUtil {
             return 0;
         }
     }
+
+    /**
+     * 获取指定应用的版本号
+     * @param context 上下文
+     * @param packageName 应用包名
+     * @return 应用的版本号，未找到返回-1
+     */
+    public static int getVersionCodeOfApp(Context context, String packageName) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, 0);
+            return packageInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return -1;
+        }
+    }
+
+    /**
+     * 判断应用是否正在运行
+     * @param context 上下文
+     * @param packageName 应用包名
+     * @return 是否正在运行
+     */
+    public static boolean isAppRunning(Context context, String packageName) {
+        android.app.ActivityManager am = (android.app.ActivityManager)
+                context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (am != null) {
+            java.util.List<android.app.ActivityManager.RunningAppProcessInfo> list = am.getRunningAppProcesses();
+            if (list != null) {
+                for (android.app.ActivityManager.RunningAppProcessInfo info : list) {
+                    if (info.processName.equals(packageName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }

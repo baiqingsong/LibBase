@@ -48,4 +48,8 @@ dependencies {
     implementation files('libs/lite-orm-1.9.1.jar')
     api 'com.google.code.gson:gson:2.10.1'
 
+    // RxJava3 (RxTask依赖)
+    api 'io.reactivex.rxjava3:rxjava:3.1.8'
+    api 'io.reactivex.rxjava3:rxandroid:3.0.2'
+
 }

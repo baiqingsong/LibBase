@@ -272,13 +272,17 @@ public class LNetUtil {
      * @return 是否可连接
      */
     public static boolean isPortReachable(String host, int port, int timeout) {
+        java.net.Socket socket = null;
         try {
-            java.net.Socket socket = new java.net.Socket();
+            socket = new java.net.Socket();
             socket.connect(new java.net.InetSocketAddress(host, port), timeout);
-            socket.close();
             return true;
         } catch (Exception e) {
             return false;
+        } finally {
+            if (socket != null) {
+                try { socket.close(); } catch (Exception ignored) {}
+            }
         }
     }
 
@@ -347,6 +351,47 @@ public class LNetUtil {
         if (cm == null) return false;
         NetworkInfo info = cm.getActiveNetworkInfo();
         return info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_ETHERNET;
+    }
+
+    /**
+     * 从 ping 输出中解析平均耗时（ms）。如果失败返回 null。
+     * @param host 主机地址
+     * @param pingCount ping次数
+     * @return 平均延迟毫秒数，失败返回null
+     */
+    public static Double getPingAverageMs(String host, int pingCount) {
+        StringBuffer sb = new StringBuffer();
+        boolean ok = ping(host, pingCount, sb);
+        if (!ok) return null;
+        String out = sb.toString();
+        for (String line : out.split("\n")) {
+            if (line.contains("avg")) {
+                int eq = line.indexOf('=');
+                if (eq >= 0 && eq + 1 < line.length()) {
+                    String tail = line.substring(eq + 1).trim().replace(" ms", "").trim();
+                    String[] parts = tail.split("/");
+                    if (parts.length >= 2) {
+                        try {
+                            return Double.parseDouble(parts[1]);
+                        } catch (Exception ignore) {
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 网络是否已连接
+     * @param context 上下文
+     * @return 是否已连接
+     */
+    public static boolean isNetworkConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm != null ? cm.getActiveNetworkInfo() : null;
+        return activeNetwork != null && activeNetwork.isAvailable();
     }
 
 }

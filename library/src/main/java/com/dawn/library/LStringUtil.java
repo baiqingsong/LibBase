@@ -499,4 +499,124 @@ public class LStringUtil {
         return sb.toString();
     }
 
+    /**
+     * 判断字符串是否不为空
+     * @param str 判断的字符串
+     * @return 是否不为空
+     */
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
+    }
+
+    /**
+     * 安全获取字符串，null返回空字符串
+     * @param str 原字符串
+     * @return 非null字符串
+     */
+    public static String nullToEmpty(String str) {
+        return str == null ? "" : str;
+    }
+
+    /**
+     * 空字符串转null
+     * @param str 原字符串
+     * @return 空字符串返回null
+     */
+    public static String emptyToNull(String str) {
+        return isEmpty(str) ? null : str;
+    }
+
+    /**
+     * 截取字符串（安全截取，不会越界）
+     * @param str 原字符串
+     * @param start 开始位置
+     * @param end 结束位置
+     * @return 截取后的字符串
+     */
+    public static String substring(String str, int start, int end) {
+        if (isEmpty(str)) return str;
+        int len = str.length();
+        if (start < 0) start = 0;
+        if (end > len) end = len;
+        if (start > end) return "";
+        return str.substring(start, end);
+    }
+
+    /**
+     * 隐藏手机号中间4位
+     * @param phone 手机号
+     * @return 隐藏后的手机号（如：138****1234）
+     */
+    public static String hidePhoneMiddle(String phone) {
+        if (isEmpty(phone) || phone.length() < 7) return phone;
+        return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
+    }
+
+    /**
+     * 隐藏邮箱用户名部分
+     * @param email 邮箱地址
+     * @return 隐藏后的邮箱（如：a***b@example.com）
+     */
+    public static String hideEmail(String email) {
+        if (isEmpty(email) || !email.contains("@")) return email;
+        int atIndex = email.indexOf("@");
+        String name = email.substring(0, atIndex);
+        String domain = email.substring(atIndex);
+        if (name.length() <= 2) {
+            return name.charAt(0) + "***" + domain;
+        }
+        return name.charAt(0) + "***" + name.charAt(name.length() - 1) + domain;
+    }
+
+    /**
+     * 生成随机字符串
+     * @param length 长度
+     * @return 随机字符串（字母+数字）
+     */
+    public static String randomString(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder();
+        java.util.Random random = new java.util.Random();
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 生成随机数字字符串
+     * @param length 长度
+     * @return 随机数字字符串
+     */
+    public static String randomNumeric(int length) {
+        StringBuilder sb = new StringBuilder();
+        java.util.Random random = new java.util.Random();
+        for (int i = 0; i < length; i++) {
+            sb.append(random.nextInt(10));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 字符串分割（支持多个分隔符）
+     * @param str 原字符串
+     * @param delimiters 分隔符字符串（每个字符都是分隔符）
+     * @return 分割后的数组
+     */
+    public static String[] split(String str, String delimiters) {
+        if (isEmpty(str)) return new String[0];
+        if (isEmpty(delimiters)) return new String[]{str};
+        return str.split("[" + java.util.regex.Pattern.quote(delimiters) + "]+");
+    }
+
+    /**
+     * 统计子串出现次数（兼容别名）
+     * @param str 原字符串
+     * @param sub 子串
+     * @return 出现次数
+     */
+    public static int countOccurrences(String str, String sub) {
+        return countMatches(str, sub);
+    }
+
 }
